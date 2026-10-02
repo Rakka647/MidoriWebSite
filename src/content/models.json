@@ -35,7 +35,13 @@
       "/models/brat/06.webp",
       "/models/brat/07.webp"
     ],
-    "link": "https://www.goofish.com/item?id=954067043007&categoryId=50023914"
+    "link": "https://www.goofish.com/item?id=954067043007&categoryId=50023914",
+    "versions": [
+      {
+        "name": "无面捕版",
+        "price": "69.9"
+      }
+    ]
   },
   {
     "id": "emo",
