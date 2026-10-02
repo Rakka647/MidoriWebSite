@@ -152,43 +152,79 @@ function erpBadge(erp: boolean | null) {
   return "未标注"
 }
 
+const SHOP_LINK = "https://www.goofish.com/personal?spm=a21ybx.home.nav.1.4c053da6GMjw4U"
+
 export function SideRail({ onCatalog }: { onCatalog: () => void }) {
+  const [group, setGroup] = useState(false)
+
+  useEffect(() => {
+    if (!group) return
+    const onKey = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") setGroup(false)
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [group])
+
   return createPortal(
-    <aside className="rail">
-      <button type="button" aria-label="目录" onClick={onCatalog}>
-        <svg className="dots" viewBox="0 0 24 24" aria-hidden="true">
-          {[5, 12, 19].flatMap((cy) => [5, 12, 19].map((cx) => <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="1.9" />))}
-        </svg>
-      </button>
-      <button type="button">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M5 8h14l-1 11H6z" />
-          <path d="M9 8V6.5a3 3 0 0 1 6 0V8" />
-        </svg>
-        <span>闲鱼店铺</span>
-        <em>↗</em>
-      </button>
-      <button type="button">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="3.5" y="7" width="17" height="11" rx="2" />
-          <path d="M8 4l3 3M16 4l-3 3" />
-          <circle cx="9" cy="12.5" r="0.9" />
-          <circle cx="15" cy="12.5" r="0.9" />
-        </svg>
-        <span>B站账号</span>
-        <em>↗</em>
-      </button>
-      <button type="button">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="9" cy="9" r="2.8" />
-          <circle cx="16.5" cy="10" r="2.2" />
-          <path d="M3.5 19c.5-2.8 2.7-4.4 5.5-4.4s5 1.6 5.5 4.4" />
-          <path d="M15 15.2c2.6-.3 4.8 1 5.5 3.8" />
-        </svg>
-        <span>通知群</span>
-        <em>↗</em>
-      </button>
-    </aside>,
+    <>
+      <aside className="rail">
+        <button type="button" aria-label="目录" onClick={onCatalog}>
+          <svg className="dots" viewBox="0 0 24 24" aria-hidden="true">
+            {[5, 12, 19].flatMap((cy) => [5, 12, 19].map((cx) => <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="1.9" />))}
+          </svg>
+        </button>
+        <a href={SHOP_LINK} target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 8h14l-1 11H6z" />
+            <path d="M9 8V6.5a3 3 0 0 1 6 0V8" />
+          </svg>
+          <span>闲鱼店铺</span>
+          <em>↗</em>
+        </a>
+        <button className="is-soon" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3.5" y="7" width="17" height="11" rx="2" />
+            <path d="M8 4l3 3M16 4l-3 3" />
+            <circle cx="9" cy="12.5" r="0.9" />
+            <circle cx="15" cy="12.5" r="0.9" />
+          </svg>
+          <span>B站账号</span>
+          <em>↗</em>
+        </button>
+        <button type="button" onClick={() => setGroup(true)}>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="9" cy="9" r="2.8" />
+            <circle cx="16.5" cy="10" r="2.2" />
+            <path d="M3.5 19c.5-2.8 2.7-4.4 5.5-4.4s5 1.6 5.5 4.4" />
+            <path d="M15 15.2c2.6-.3 4.8 1 5.5 3.8" />
+          </svg>
+          <span>通知群</span>
+        </button>
+      </aside>
+      {group ? (
+        <div className="notice" role="dialog" aria-modal="true" onClick={() => setGroup(false)}>
+          <div className="notice-box qr-box" onClick={(event) => event.stopPropagation()}>
+            <i aria-hidden="true" />
+            <strong>通知群</strong>
+            <p>用微信或 QQ 扫码加入。</p>
+            <div className="qr-row">
+              <figure>
+                <img src="/qr/wechat.png" alt="微信二维码" />
+                <figcaption>微信</figcaption>
+              </figure>
+              <figure>
+                <img src="/qr/qq.png" alt="QQ 群二维码" />
+                <figcaption>QQ 群 1128251942</figcaption>
+              </figure>
+            </div>
+            <button type="button" autoFocus onClick={() => setGroup(false)}>
+              关闭
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </>,
     document.body,
   )
 }

@@ -5579,3 +5579,149 @@ html {
 .d-get:disabled:hover {
   transform: none;
 }
+
+/* ---- hide unfinished header / rail items without deleting them ---- */
+.is-soon {
+  display: none !important;
+}
+
+.explore-row {
+  padding-top: 14px;
+}
+
+/* ---- shop link uses the same tile look as the other rail buttons ---- */
+.rail a {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: none;
+  width: 52px;
+  height: 64px;
+  padding: 8px 2px 10px;
+  border: 0;
+  background: transparent;
+  color: #111;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.rail a svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.rail a em {
+  display: none;
+}
+
+.rail a:hover {
+  background: #d6ef45;
+}
+
+.rail button + a::before,
+.rail a + button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 10px;
+  right: 10px;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.22);
+  pointer-events: none;
+}
+
+/* ---- notice group QR popup ---- */
+.qr-box {
+  min-width: 420px;
+  max-width: min(640px, calc(100vw - 32px));
+}
+
+.qr-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  width: 100%;
+  margin: 6px 0 8px;
+}
+
+.qr-row figure {
+  margin: 0;
+  padding: 10px;
+  background: #111;
+}
+
+.qr-row img {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #fff;
+}
+
+.qr-row figcaption {
+  margin-top: 8px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .qr-box {
+    min-width: 0;
+    width: min(360px, calc(100vw - 24px));
+  }
+
+  .qr-row {
+    grid-template-columns: 1fr;
+  }
+
+  .rail a,
+  .rail a:first-child {
+    flex: 1;
+    width: auto;
+    height: 56px;
+    padding: 6px 2px 8px;
+  }
+
+  .rail button + a::before,
+  .rail a + button::before {
+    top: 10px;
+    right: auto;
+    bottom: 10px;
+    left: 0;
+    width: 1px;
+    height: auto;
+  }
+}
+
+/* ---- detail: description cards line up with the photo and the buy panel ---- */
+@media (min-width: 981px) {
+  .d-split {
+    grid-template-columns: 58px minmax(0, 1.15fr) minmax(280px, 0.86fr);
+    gap: 12px;
+  }
+
+  .d-split .d-card:first-child {
+    grid-column: 2;
+  }
+
+  .d-split .d-card:last-child {
+    grid-column: 3;
+  }
+}
+
+/* ---- hide the default photo corner watermarks; keep the real image clean ---- */
+.d-mark,
+.d-sign {
+  display: none;
+}
