@@ -22,7 +22,7 @@ export function Header({ theme, onToggleTheme, onGallery, onHome }: HeaderProps)
           <strong>成品模型</strong>
           <small>AVATARS</small>
         </button>
-        <button className="bar-link" type="button" onClick={onGallery}>
+        <button className="bar-link is-soon" type="button" onClick={onGallery}>
           <strong>返图展示</strong>
           <small>GALLERY</small>
           <i />
@@ -31,7 +31,7 @@ export function Header({ theme, onToggleTheme, onGallery, onHome }: HeaderProps)
           <span className="burger" />
         </button>
       </nav>
-      <div className="utility-dock">
+      <div className="utility-dock is-soon">
         <button
           className="bar-icon"
           type="button"
