@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
-import { displayPrice, erpTag, modelTags, models, type Model } from "../models"
+import { displayPrice, erpTag, fullImage, modelTags, models, type Model } from "../models"
 import { serverLikes, useFavorites, useLikes } from "../favorites"
 
 type DetailProps = {
@@ -79,6 +79,7 @@ export function Detail({ model, onOpen, onPickTag }: DetailProps) {
   const pills = [...bodyPills, ...(erpTag(model.erp) ? [erpTag(model.erp) as string] : [])]
   const paragraphs = model.description.split("\n").map((line) => line.trim()).filter(Boolean)
   const image = images[Math.min(shot, images.length - 1)]
+  const zoomImage = fullImage(model, Math.min(shot, images.length - 1)) || image
 
   useEffect(() => {
     setShot(0)
@@ -336,10 +337,10 @@ export function Detail({ model, onOpen, onPickTag }: DetailProps) {
         </div>
       </section>
 
-      {zoom && image
+      {zoom && zoomImage
         ? createPortal(
             <div className="lightbox" role="dialog" aria-modal="true" onClick={() => setZoom(false)}>
-              <img src={image} alt={model.name} onClick={(event) => event.stopPropagation()} />
+              <img src={zoomImage} alt={model.name} onClick={(event) => event.stopPropagation()} />
               <button className="lightbox-close" type="button" aria-label="关闭" onClick={() => setZoom(false)}>
                 ×
               </button>

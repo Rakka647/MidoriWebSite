@@ -292,9 +292,6 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
     <main className="view studio">
       <div className="home-row">
         <section className="showcase">
-          <span className="photo-count">
-            {pad(total ? index + 1 : 0)} / {pad(total)}
-          </span>
           <div className="showcase-stage">
             <BannerReel slides={slides} index={index} onOpen={onOpen} />
             <div className="pager">

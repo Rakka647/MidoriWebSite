@@ -25,6 +25,12 @@ export type Model = {
   link?: string
   description: string
   images: string[]
+  /** 点开展示图时用的原图；没有就用 images */
+  fullImages?: string[]
+}
+
+export function fullImage(model: Pick<Model, "images" | "fullImages">, index: number) {
+  return model.fullImages?.[index] || model.images[index] || ""
 }
 
 export const models = raw as Model[]

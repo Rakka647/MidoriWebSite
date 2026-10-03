@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useLayoutEffect, useState } from "react"
 import { Header } from "./components/Header"
 import { Detail } from "./components/Detail"
 import { Home, SideRail } from "./components/Home"
@@ -45,6 +45,7 @@ export default function App() {
   const [tagOpen, setTagOpen] = useState(false)
   const [erpFilter, setErpFilter] = useState<ErpFilter>("all")
   const [canScroll, setCanScroll] = useState(false)
+  const [canTop, setCanTop] = useState(false)
 
   // 「返图展示」和「暗色模式」还没做，点了先弹出提示
   const [notice, setNotice] = useState<string | null>(null)
@@ -64,10 +65,23 @@ export default function App() {
     return () => window.removeEventListener("hashchange", onHash)
   }, [])
 
+  useLayoutEffect(() => {
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual"
+    const top = () => window.scrollTo(0, 0)
+    top()
+    const frame = window.requestAnimationFrame(top)
+    const timer = window.setTimeout(top, 80)
+    return () => {
+      window.cancelAnimationFrame(frame)
+      window.clearTimeout(timer)
+    }
+  }, [])
+
   useEffect(() => {
     const measure = () => {
       const left = document.documentElement.scrollHeight - window.scrollY - window.innerHeight
       setCanScroll(left > 80)
+      setCanTop(window.scrollY > 240)
     }
     measure()
     window.addEventListener("scroll", measure, { passive: true })
@@ -169,18 +183,32 @@ export default function App() {
           )}
         </div>
       </div>
-      <button
-        className={`scroll-down${canScroll ? " is-on" : ""}`}
-        type="button"
-        aria-label="向下滚动"
-        tabIndex={canScroll ? 0 : -1}
-        onClick={() => window.scrollBy({ top: Math.round(window.innerHeight * 0.85), behavior: "smooth" })}
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 5v13" />
-          <path d="m6 13 6 6 6-6" />
-        </svg>
-      </button>
+      <div className="scroll-dock">
+        <button
+          className={`scroll-btn scroll-up${canTop ? " is-on" : ""}`}
+          type="button"
+          aria-label="返回顶部"
+          tabIndex={canTop ? 0 : -1}
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 19V6" />
+            <path d="m6 11 6-6 6 6" />
+          </svg>
+        </button>
+        <button
+          className={`scroll-btn scroll-down${canScroll ? " is-on" : ""}`}
+          type="button"
+          aria-label="向下滚动"
+          tabIndex={canScroll ? 0 : -1}
+          onClick={() => window.scrollBy({ top: Math.round(window.innerHeight * 0.85), behavior: "smooth" })}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 5v13" />
+            <path d="m6 13 6 6 6-6" />
+          </svg>
+        </button>
+      </div>
       {notice ? (
         <div className="notice" role="dialog" aria-modal="true" onClick={() => setNotice(null)}>
           <div className="notice-box" onClick={(event) => event.stopPropagation()}>

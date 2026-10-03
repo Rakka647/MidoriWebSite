@@ -3140,6 +3140,7 @@ body {
 
 .d-split {
   display: grid;
+  align-items: start;
   grid-template-columns: 1.15fr 0.85fr;
   gap: 14px;
   margin-top: 16px;
@@ -4317,12 +4318,20 @@ body {
   }
 }
 
-/* ---- scroll-down button ---- */
-.scroll-down {
+/* ---- scroll-down / back-to-top ---- */
+.scroll-dock {
   position: fixed;
   z-index: 60;
   right: 24px;
   bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.scroll-btn,
+.scroll-down {
+  position: relative;
   display: grid;
   place-items: center;
   width: 52px;
@@ -4341,12 +4350,14 @@ body {
     background 0.25s var(--ease);
 }
 
+.scroll-btn.is-on,
 .scroll-down.is-on {
   opacity: 1;
   pointer-events: auto;
   transform: none;
 }
 
+.scroll-btn svg,
 .scroll-down svg {
   width: 24px;
   height: 24px;
@@ -4354,9 +4365,13 @@ body {
   stroke: currentColor;
   stroke-width: 2.4;
   stroke-linecap: square;
+}
+
+.scroll-down svg {
   animation: nudge-down 1.6s ease-in-out infinite;
 }
 
+.scroll-btn:hover,
 .scroll-down:hover {
   background: #fff;
 }
@@ -5561,9 +5576,13 @@ html {
     height: auto;
   }
 
-  .scroll-down {
+  .scroll-dock {
     right: 12px;
     bottom: 68px;
+  }
+
+  .scroll-btn,
+  .scroll-down {
     width: 44px;
     height: 44px;
   }
@@ -5707,6 +5726,7 @@ html {
 /* ---- detail: description cards line up with the photo and the buy panel ---- */
 @media (min-width: 981px) {
   .d-split {
+    align-items: start;
     grid-template-columns: 58px minmax(0, 1.15fr) minmax(280px, 0.86fr);
     gap: 12px;
   }
@@ -5717,7 +5737,12 @@ html {
 
   .d-split .d-card:last-child {
     grid-column: 3;
+    height: auto;
   }
+}
+
+.photo-count {
+  display: none;
 }
 
 /* ---- hide the default photo corner watermarks; keep the real image clean ---- */
