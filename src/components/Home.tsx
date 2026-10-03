@@ -205,6 +205,9 @@ export function SideRail({ onCatalog }: { onCatalog: () => void }) {
       {group ? (
         <div className="notice" role="dialog" aria-modal="true" onClick={() => setGroup(false)}>
           <div className="notice-box qr-box" onClick={(event) => event.stopPropagation()}>
+            <button className="qr-x" type="button" aria-label="关闭" onClick={() => setGroup(false)}>
+              ×
+            </button>
             <i aria-hidden="true" />
             <strong>通知群</strong>
             <p>用微信或 QQ 扫码加入。</p>

@@ -5661,21 +5661,40 @@ html {
 
 /* ---- notice group QR popup ---- */
 .qr-box {
-  min-width: 420px;
-  max-width: min(640px, calc(100vw - 32px));
+  min-width: 0;
+  width: min(520px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  overflow: auto;
+}
+
+.qr-x {
+  position: sticky;
+  top: 0;
+  justify-self: end;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  margin: -8px -8px 0 0;
+  padding: 0;
+  border: 0;
+  background: #111;
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
 }
 
 .qr-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  gap: 12px;
   width: 100%;
   margin: 6px 0 8px;
 }
 
 .qr-row figure {
   margin: 0;
-  padding: 10px;
+  padding: 8px;
   background: #111;
 }
 
@@ -5683,6 +5702,8 @@ html {
   display: block;
   width: 100%;
   height: auto;
+  max-height: 36vh;
+  object-fit: contain;
   background: #fff;
 }
 
@@ -5695,13 +5716,32 @@ html {
 }
 
 @media (max-width: 720px) {
+  .notice {
+    padding: 10px 10px 72px;
+    align-items: center;
+    align-content: center;
+  }
+
   .qr-box {
     min-width: 0;
-    width: min(360px, calc(100vw - 24px));
+    width: min(360px, calc(100vw - 20px));
+    max-height: calc(100dvh - 82px);
+    padding: 16px 14px 14px;
+    gap: 6px;
   }
 
   .qr-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 2px 0 6px;
+  }
+
+  .qr-row img {
+    max-height: 28vh;
+  }
+
+  .qr-box > button:last-child {
+    width: 100%;
   }
 
   .rail a,
