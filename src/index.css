@@ -5750,3 +5750,186 @@ html {
 .d-sign {
   display: none;
 }
+
+/* ---- simple phone pass (Figma will replace this later) ---- */
+@media (max-width: 720px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  .shell {
+    width: calc(100% - 20px);
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 88px;
+  }
+
+  .edge-lines,
+  .mini-kicker,
+  .explore-plus,
+  .bar-icon,
+  .d-plus,
+  .d-rel-arrow,
+  .d-card header button {
+    display: none;
+  }
+
+  .bar {
+    min-height: 0;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 0 6px;
+  }
+
+  .brand-mark {
+    min-width: 56px;
+    height: 30px;
+    font-size: 18px;
+  }
+
+  .brand-meta strong {
+    font-size: 13px;
+  }
+
+  .bar-link {
+    min-width: 0;
+    height: 40px;
+    padding: 0 12px;
+  }
+
+  .showcase-copy {
+    padding: 8px 0 0;
+  }
+
+  .showcase-copy h1 {
+    font-size: 42px;
+    line-height: 0.9;
+    white-space: normal;
+  }
+
+  .showcase-kicker,
+  .showcase-id,
+  .showcase-note {
+    max-width: none;
+    font-size: 12px;
+  }
+
+  .explore-row {
+    padding-top: 10px;
+    width: 100%;
+  }
+
+  .explore {
+    width: min(100%, 280px);
+    height: 46px;
+    font-size: 16px;
+    gap: 12px;
+  }
+
+  body {
+    --banner-h: 210px;
+  }
+
+  .photos {
+    height: var(--banner-h);
+  }
+
+  .slot-a,
+  .slot-b,
+  .slot-enter,
+  .slot-exit {
+    display: none;
+  }
+
+  .slot-main {
+    left: 0;
+    width: 100%;
+  }
+
+  .sheet {
+    padding: 18px 14px 22px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .chips {
+    flex-wrap: wrap;
+  }
+
+  .d-hero,
+  .d-thumbs {
+    min-height: 0;
+  }
+
+  .d-thumbs {
+    height: auto;
+    overflow: hidden;
+  }
+
+  .d-thumb-list {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .d-thumb,
+  .d-thumb-nav {
+    width: 48px;
+    height: 48px;
+  }
+
+  .d-thumb-nav {
+    height: 36px;
+  }
+
+  .d-stage,
+  .d-buy {
+    min-height: 0;
+  }
+
+  .d-stage {
+    aspect-ratio: 6 / 5;
+  }
+
+  .d-buy {
+    padding: 16px 14px 20px;
+  }
+
+  .d-buy h1 {
+    font-size: 28px;
+  }
+
+  .d-actions {
+    flex-wrap: wrap;
+    padding-top: 12px;
+  }
+
+  .d-rel-wrap {
+    grid-template-columns: 1fr;
+  }
+
+  .d-rel-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lightbox-close,
+  .lightbox-nav {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+  }
+
+  .lightbox-nav.is-prev {
+    left: 8px;
+  }
+
+  .lightbox-nav.is-next {
+    right: 8px;
+  }
+}
