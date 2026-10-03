@@ -5540,6 +5540,26 @@ html {
   .d-stage {
     min-width: 0;
   }
+
+  .d-stage {
+    width: 100%;
+    height: auto;
+    min-height: 180px;
+  }
+
+  .d-stage img {
+    position: static;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    aspect-ratio: 6 / 5;
+    object-fit: cover;
+  }
 }
 
 @media (max-width: 720px) {
@@ -5934,7 +5954,24 @@ html {
   }
 
   .d-stage {
+    width: 100%;
+    height: auto;
+    min-height: 180px;
+  }
+
+  /* 真机 Safari 不会给“里面只有绝对定位图片”的盒子算出高度，图会在但看不见 */
+  .d-stage img {
+    position: static;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: none;
     aspect-ratio: 6 / 5;
+    object-fit: cover;
   }
 
   .d-buy {
