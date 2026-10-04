@@ -1,6 +1,16 @@
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react"
+import { Fragment, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react"
 import { createPortal } from "react-dom"
-import { bannerModels, displayPrice, matchesPicked, modelTags, tagLevels, type ErpFilter, type Model } from "../models"
+import {
+  bannerModels,
+  bannerTags,
+  displayPrice,
+  matchesPicked,
+  modelTags,
+  priceValue,
+  tagLevels,
+  type ErpFilter,
+  type Model,
+} from "../models"
 import { useFavorites } from "../favorites"
 
 type HomeProps = {
@@ -14,7 +24,15 @@ type HomeProps = {
   onTagOpen: (open: boolean) => void
 }
 
-type Slide = { id: string; src: string }
+type Slide = { id: string; src: string; tags: string[] }
+type SortMode = "publish-asc" | "publish-desc" | "price-asc" | "price-desc"
+
+const SORT_OPTIONS: { id: SortMode; label: string }[] = [
+  { id: "publish-desc", label: "最新发布" },
+  { id: "publish-asc", label: "最早发布" },
+  { id: "price-asc", label: "价格从低到高" },
+  { id: "price-desc", label: "价格从高到低" },
+]
 
 const SLIDE_MS = 820
 
@@ -38,25 +56,25 @@ function Photo({ src }: { src: string }) {
 
 function BannerReel({ slides, index, onOpen }: { slides: Slide[]; index: number; onOpen: (id: string) => void }) {
   const prevRef = useRef(index)
-  const [motion, setMotion] = useState<{ from: number; to: number; on: boolean } | null>(null)
+  const [motion, setMotion] = useState<{ from: number; to: number; on: boolean; jump: boolean } | null>(null)
 
   useEffect(() => {
     const from = prevRef.current
     if (from === index || slides.length === 0) return
     let cancelled = false
     const isStep = (from + 1) % slides.length === index
-    if (!isStep || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       prevRef.current = index
       setMotion(null)
       return
     }
-    setMotion({ from, to: index, on: false })
+    setMotion({ from, to: index, on: false, jump: !isStep })
     let frame = 0
     frame = window.requestAnimationFrame(() => {
       frame = window.requestAnimationFrame(() => {
         if (cancelled) return
         prevRef.current = index
-        setMotion({ from, to: index, on: true })
+        setMotion({ from, to: index, on: true, jump: !isStep })
       })
     })
     const done = window.setTimeout(() => {
@@ -81,17 +99,34 @@ function BannerReel({ slides, index, onOpen }: { slides: Slide[]; index: number;
     },
   })
   const at = (value: number) => slides[((value % total) + total) % total]
+  const figure = (slide: Slide, slot: string, key: string, extra = "") => (
+    <figure key={key} className={`photo-item slot-${slot}${extra}`} {...openProps(slide.id)}>
+      <Photo src={slide.src} />
+    </figure>
+  )
 
   if (!motion) {
+    // index 已经变了、动画还没挂上时，继续画上一组，避免先闪出下一张。
     return (
       <div className="photos">
         {(["main", "a", "b"] as const).map((slot, offset) => {
-          const slide = at(index + offset)
-          return (
-            <figure key={slide.id} className={`photo-item slot-${slot}`} {...openProps(slide.id)}>
-              <Photo src={slide.src} />
-            </figure>
-          )
+          const slide = at(prevRef.current + offset)
+          return figure(slide, slot, slide.id)
+        })}
+      </div>
+    )
+  }
+
+  if (motion.jump) {
+    return (
+      <div className="photos">
+        {(["main", "a", "b"] as const).map((slot, offset) => {
+          const slide = at(motion.from + offset)
+          return figure(slide, slot, slide.id, motion.on ? " is-reel-out" : "")
+        })}
+        {(["main", "a", "b"] as const).map((slot, offset) => {
+          const slide = at(motion.to + offset)
+          return figure(slide, slot, `in-${slide.id}`, motion.on ? " is-reel-in" : " is-reel-in is-prep")
         })}
       </div>
     )
@@ -104,15 +139,7 @@ function BannerReel({ slides, index, onOpen }: { slides: Slide[]; index: number;
       {[0, 1, 2, 3].map((delta) => {
         const slide = at(motion.from + delta)
         const slot = motion.on ? endSlot[delta] : startSlot[delta]
-        return (
-          <figure
-            key={slide.id}
-            className={`photo-item slot-${slot}${motion.on ? "" : " is-prep"}`}
-            {...openProps(slide.id)}
-          >
-            <Photo src={slide.src} />
-          </figure>
-        )
+        return figure(slide, slot, slide.id, motion.on ? "" : " is-prep")
       })}
     </div>
   )
@@ -235,13 +262,16 @@ export function SideRail({ onCatalog }: { onCatalog: () => void }) {
 export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onErpFilter: setFilter, tagOpen, onTagOpen }: HomeProps) {
   // 横幅循环播放四个模型：管理员固定的（最多两个）+ 其余里编号最大的，每个模型取第一张图。
   const slides = useMemo<Slide[]>(
-    () => bannerModels(models).map((model) => ({ id: model.id, src: model.images[0] })),
+    () => bannerModels(models).map((model) => ({ id: model.id, src: model.images[0], tags: bannerTags(model) })),
     [models],
   )
   const total = slides.length
   const [index, setIndex] = useState(0)
   const [query, setQuery] = useState("")
   const [onlyFav, setOnlyFav] = useState(false)
+  const [sort, setSort] = useState<SortMode>("publish-asc")
+  const [sortOpen, setSortOpen] = useState(false)
+  const sortRef = useRef<HTMLDivElement>(null)
   const favorites = useFavorites()
   // 收藏过、后来被删掉的模型不算数
   const favoriteCount = favorites.list.filter((id) => models.some((model) => model.id === id)).length
@@ -261,10 +291,11 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
   }, [total, index])
 
   const levels = useMemo(() => tagLevels(models), [models])
+  const publishRank = useMemo(() => new Map(models.map((model, order) => [model.id, order])), [models])
 
   const visible = useMemo(() => {
     const word = query.trim().toLowerCase()
-    return models.filter((model) => {
+    const list = models.filter((model) => {
       if (filter === "erp" && model.erp !== true) return false
       if (filter === "plain" && model.erp !== false) return false
       if (onlyFav && !favorites.list.includes(model.id)) return false
@@ -273,7 +304,16 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
       const haystack = [model.name, model.series, model.code, ...modelTags(model)].join(" ").toLowerCase()
       return haystack.includes(word)
     })
-  }, [favorites.list, filter, levels, models, onlyFav, picked, query])
+    return [...list].sort((a, b) => {
+      const byPublish = (publishRank.get(a.id) ?? 0) - (publishRank.get(b.id) ?? 0)
+      if (sort === "price-asc" || sort === "price-desc") {
+        const diff = priceValue(a) - priceValue(b)
+        if (diff !== 0) return sort === "price-asc" ? diff : -diff
+        return byPublish
+      }
+      return sort === "publish-desc" ? -byPublish : byPublish
+    })
+  }, [favorites.list, filter, levels, models, onlyFav, picked, publishRank, query, sort])
 
   // 每页 5 × 3 = 15 个；筛选条件变了就回到第一页。
   const [page, setPage] = useState(0)
@@ -284,7 +324,23 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
 
   useEffect(() => {
     setPage(0)
-  }, [filter, onlyFav, picked, query])
+  }, [filter, onlyFav, picked, query, sort])
+
+  useEffect(() => {
+    if (!sortOpen) return
+    const onPointer = (event: PointerEvent) => {
+      if (!sortRef.current?.contains(event.target as Node)) setSortOpen(false)
+    }
+    const onKey = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") setSortOpen(false)
+    }
+    document.addEventListener("pointerdown", onPointer)
+    window.addEventListener("keydown", onKey)
+    return () => {
+      document.removeEventListener("pointerdown", onPointer)
+      window.removeEventListener("keydown", onKey)
+    }
+  }, [sortOpen])
 
   function goPage(next: number) {
     setPage(Math.max(0, Math.min(pageCount - 1, next)))
@@ -336,13 +392,20 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
                   <span className="explore-go">↗</span>
                 </button>
                 <span className="explore-plus" aria-hidden="true">+</span>
-                <span className="mini-kicker">
-                  CUTE
-                  <br />×<br />
-                  DARK
-                  <br />×<br />
-                  VIRTUAL
-                </span>
+                {slides[index]?.tags.length ? (
+                  <span className="mini-kicker">
+                    {slides[index].tags.map((tag, order) => (
+                      <Fragment key={tag}>
+                        {order ? (
+                          <>
+                            <br />×<br />
+                          </>
+                        ) : null}
+                        {tag}
+                      </Fragment>
+                    ))}
+                  </span>
+                ) : null}
               </div>
             </div>
           </div>
@@ -399,6 +462,36 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
               ▽ 更多筛选
               {picked.length ? <em className="tag-count">{picked.length}</em> : null}
             </button>
+            <div className="sort-drop" ref={sortRef}>
+              <button
+                className={`chip chip-sort${sortOpen || sort !== "publish-asc" ? " is-on" : ""}`}
+                type="button"
+                aria-expanded={sortOpen}
+                aria-haspopup="listbox"
+                onClick={() => setSortOpen((open) => !open)}
+              >
+                ▽ {SORT_OPTIONS.find((option) => option.id === sort)?.label}
+              </button>
+              {sortOpen ? (
+                <div className="sort-menu" role="listbox" aria-label="排序">
+                  {SORT_OPTIONS.map((option) => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      role="option"
+                      aria-selected={sort === option.id}
+                      className={sort === option.id ? "is-on" : ""}
+                      onClick={() => {
+                        setSort(option.id)
+                        setSortOpen(false)
+                      }}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
 
@@ -445,23 +538,39 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
         ) : null}
         <div className="grid">
           {pageItems.map((model) => (
-            <button key={model.id} className="card work" type="button" onClick={() => onOpen(model.id)}>
-              <span className="frame">
-                {model.images[0] ? <img src={model.images[0]} alt={model.name} loading="lazy" decoding="async" /> : null}
-              </span>
-              <span className="work-meta">
-                <span className="work-name">
-                  <strong>{model.name}</strong>
-                  <span className={`badge${model.erp === true ? "" : " is-off"}`}>{erpBadge(model.erp)}</span>
+            <article key={model.id} className="card work">
+              <button className="card-open" type="button" onClick={() => onOpen(model.id)}>
+                <span className="frame">
+                  {model.images[0] ? <img src={model.images[0]} alt={model.name} loading="lazy" decoding="async" /> : null}
                 </span>
-                <em>{displayPrice(model)}</em>
-              </span>
-              <span className="work-foot">
-                {randomTags(model, tagSeed.current).map((tag) => (
-                  <span key={tag}>{tag}</span>
-                ))}
-              </span>
-            </button>
+                <span className="work-meta">
+                  <span className="work-name">
+                    <strong>{model.name}</strong>
+                    <span className={`badge${model.erp === true ? "" : " is-off"}`}>{erpBadge(model.erp)}</span>
+                  </span>
+                  <em>{displayPrice(model)}</em>
+                </span>
+                <span className="work-foot">
+                  {randomTags(model, tagSeed.current).map((tag) => (
+                    <span key={tag}>{tag}</span>
+                  ))}
+                </span>
+              </button>
+              {favorites.has(model.id) ? (
+                <button
+                  className="card-unfav"
+                  type="button"
+                  aria-label="取消收藏"
+                  title="取消收藏"
+                  onClick={() => favorites.toggle(model.id)}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 3.6l2.5 5.3 5.8.7-4.3 4 1.1 5.7L12 16.7l-5.1 2.6 1.1-5.7-4.3-4 5.8-.7z" />
+                  </svg>
+                  取消收藏
+                </button>
+              ) : null}
+            </article>
           ))}
         </div>
 

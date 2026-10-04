@@ -69,6 +69,24 @@ export function displayPrice(model: Pick<Model, "price" | "versions">) {
   return model.price || model.versions?.find((version) => version.price)?.price || ""
 }
 
+/** 排序用的价格数字：取展示价里的第一个数字，没有价格排到最后。 */
+export function priceValue(model: Pick<Model, "price" | "versions">) {
+  const match = displayPrice(model).replace(/,/g, "").match(/(\d+(?:\.\d+)?)/)
+  return match ? Number(match[1]) : Number.POSITIVE_INFINITY
+}
+
+/** 横幅左下角：素体 + 颜色 + 除此以外的第一个标签。 */
+export function bannerTags(model: Model) {
+  const tags: string[] = []
+  const body = model.bodies?.[0]
+  const color = model.colors?.[0]
+  const extra = model.tags.find((tag) => tag !== body && tag !== color && tag !== "面捕")
+  if (body) tags.push(body)
+  if (color) tags.push(color)
+  if (extra) tags.push(extra)
+  return tags
+}
+
 export function erpLabel(erp: boolean | null) {
   if (erp === true) return "ERP模型"
   if (erp === false) return "无ERP模型"
@@ -108,12 +126,12 @@ export function tagLevels(list: Model[]): TagLevel[] {
   const merge = (base: string[] | undefined, used: string[]) => [...new Set([...(base ?? []), ...used])]
   return [
     { id: "body", label: "素体", mode: "any", tags: merge(pool.bodies, list.flatMap((model) => model.bodies ?? [])) },
-    { id: "color", label: "颜色", mode: "all", tags: merge(pool.colors, list.flatMap((model) => model.colors ?? [])) },
+    { id: "color", label: "颜色", mode: "any", tags: merge(pool.colors, list.flatMap((model) => model.colors ?? [])) },
     { id: "tag", label: "标签", mode: "all", tags: merge(pool.tags, list.flatMap((model) => model.tags)) },
   ]
 }
 
-/** 同一行里选了多个：素体满足其一；颜色 / 标签要全部满足。不同行之间永远是「并且」。 */
+/** 同一行里选了多个：素体、颜色满足其一；标签要全部满足。不同行之间永远是「并且」。 */
 export function matchesPicked(model: Model, picked: string[], levels: TagLevel[]) {
   if (!picked.length) return true
   const mine = new Set(modelTags(model))
