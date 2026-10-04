@@ -384,7 +384,10 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
               aria-pressed={onlyFav}
               onClick={() => setOnlyFav(!onlyFav)}
             >
-              {onlyFav ? "♥" : "♡"} 我的收藏
+              <svg className={`chip-star${onlyFav ? " is-on" : ""}`} viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3.6l2.5 5.3 5.8.7-4.3 4 1.1 5.7L12 16.7l-5.1 2.6 1.1-5.7-4.3-4 5.8-.7z" />
+              </svg>
+              我的收藏
               {favoriteCount ? <em className="tag-count">{favoriteCount}</em> : null}
             </button>
             <button
@@ -409,12 +412,9 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
                 </button>
               </div>
               <div className="tag-levels">
-                {levels.map((level, order) => (
+                {levels.map((level) => (
                   <div className="tag-level" key={level.id}>
-                    <span className="tag-level-name">
-                      <em>{String(order + 1).padStart(2, "0")}</em>
-                      {level.label}
-                    </span>
+                    <span className="tag-level-name">{level.label}</span>
                     <div className="tag-picks">
                       {level.tags.map((tag) => {
                         const on = picked.includes(tag)

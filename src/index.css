@@ -6010,3 +6010,90 @@ html {
     right: 8px;
   }
 }
+
+/* ---- smaller ERP badges, star favorites, like/fav tips, section bars ---- */
+.badge {
+  min-width: 42px;
+  height: 18px;
+  padding: 0 6px;
+  font-size: 9px;
+  line-height: 16px;
+  letter-spacing: 0.04em;
+}
+
+.sheet .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chip-star {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+.chip-star.is-on {
+  fill: currentColor;
+}
+
+.d-ico-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.d-tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  z-index: 3;
+  padding: 4px 8px;
+  border: 0;
+  background: #111;
+  color: #fff;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+  pointer-events: none;
+  animation: tipPop 0.22s var(--ease) both;
+}
+
+@keyframes tipPop {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px);
+  }
+}
+
+.d-num,
+.tag-level-name em {
+  display: none;
+}
+
+.d-card header i {
+  flex: none;
+  align-self: center;
+  width: 8px;
+  height: 22px;
+  background: #d6ef45;
+  transition: height 0.4s var(--ease);
+}
+
+.d-card header:hover i {
+  height: 30px;
+}
+
+.d-get:disabled,
+.d-get:disabled:hover {
+  background: #d6ef45;
+  color: #111;
+  cursor: pointer;
+  transform: none;
+}

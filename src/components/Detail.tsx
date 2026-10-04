@@ -8,6 +8,7 @@ type DetailProps = {
   onHome: () => void
   onOpen: (id: string) => void
   onPickTag: (tag: string) => void
+  onMissingLink: () => void
 }
 
 function infoRows(model: Model) {
@@ -63,10 +64,11 @@ function StarIcon({ filled = false }: { filled?: boolean }) {
   )
 }
 
-export function Detail({ model, onOpen, onPickTag }: DetailProps) {
+export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps) {
   const images = model.images.length ? model.images : [""]
   const [shot, setShot] = useState(0)
   const [zoom, setZoom] = useState(false)
+  const [tips, setTips] = useState<{ like?: string; fav?: string }>({})
   const favorites = useFavorites()
   const saved = favorites.has(model.id)
   const likes = useLikes()
@@ -84,6 +86,13 @@ export function Detail({ model, onOpen, onPickTag }: DetailProps) {
   useEffect(() => {
     setShot(0)
   }, [model.id])
+
+  function flash(key: "like" | "fav", text: string) {
+    setTips((current) => ({ ...current, [key]: text }))
+    window.setTimeout(() => {
+      setTips((current) => ({ ...current, [key]: undefined }))
+    }, 1400)
+  }
 
   function step(delta: number) {
     setShot((current) => (current + delta + images.length) % images.length)
@@ -190,10 +199,9 @@ export function Detail({ model, onOpen, onPickTag }: DetailProps) {
             <button
               className="d-get"
               type="button"
-              disabled={!link}
-              title={link ? undefined : "这个模型的购买链接还没有添加"}
               onClick={() => {
                 if (link) window.open(link, "_blank", "noopener,noreferrer")
+                else onMissingLink()
               }}
             >
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -203,27 +211,41 @@ export function Detail({ model, onOpen, onPickTag }: DetailProps) {
               </svg>
               获取模型
             </button>
-            <button
-              className={`d-ico d-ico-like${likes.has(model.id) ? " is-on" : ""}`}
-              type="button"
-              aria-pressed={likes.has(model.id)}
-              aria-label={likes.has(model.id) ? "已点赞" : "点赞"}
-              title={likes.has(model.id) ? "你已经点过赞了" : "点赞（每个浏览器只能点一次）"}
-              onClick={() => likes.add(model.id)}
-            >
-              <HeartIcon filled={likes.has(model.id)} />
-              <b>{likeOf(model.id)}</b>
-            </button>
-            <button
-              className={`d-ico d-ico-fav${saved ? " is-on" : ""}`}
-              type="button"
-              aria-pressed={saved}
-              aria-label={saved ? "取消收藏" : "收藏"}
-              title={saved ? "取消收藏" : "收藏"}
-              onClick={() => favorites.toggle(model.id)}
-            >
-              <StarIcon filled={saved} />
-            </button>
+            <span className="d-ico-wrap">
+              {tips.like ? <em className="d-tip">{tips.like}</em> : null}
+              <button
+                className={`d-ico d-ico-like${likes.has(model.id) ? " is-on" : ""}`}
+                type="button"
+                aria-pressed={likes.has(model.id)}
+                aria-label={likes.has(model.id) ? "取消点赞" : "点赞"}
+                title={likes.has(model.id) ? "取消点赞" : "点赞"}
+                onClick={() => {
+                  const on = likes.has(model.id)
+                  likes.toggle(model.id)
+                  if (!on) flash("like", "点赞成功")
+                }}
+              >
+                <HeartIcon filled={likes.has(model.id)} />
+                <b>{likeOf(model.id)}</b>
+              </button>
+            </span>
+            <span className="d-ico-wrap">
+              {tips.fav ? <em className="d-tip">{tips.fav}</em> : null}
+              <button
+                className={`d-ico d-ico-fav${saved ? " is-on" : ""}`}
+                type="button"
+                aria-pressed={saved}
+                aria-label={saved ? "取消收藏" : "收藏"}
+                title={saved ? "取消收藏" : "收藏"}
+                onClick={() => {
+                  const on = saved
+                  favorites.toggle(model.id)
+                  if (!on) flash("fav", "收藏成功")
+                }}
+              >
+                <StarIcon filled={saved} />
+              </button>
+            </span>
           </div>
         </aside>
       </section>
@@ -231,7 +253,7 @@ export function Detail({ model, onOpen, onPickTag }: DetailProps) {
       <section className="d-split">
         <article className="d-card">
           <header>
-            <span className="d-num">01</span>
+            <i />
             <b>详情介绍</b>
             <em>// Description</em>
             <button type="button" aria-label="关闭">
@@ -249,7 +271,7 @@ export function Detail({ model, onOpen, onPickTag }: DetailProps) {
 
         <article className="d-card">
           <header>
-            <span className="d-num">02</span>
+            <i />
             <b>模型情報</b>
             <em>// Model Info</em>
             <button type="button" aria-label="关闭">
@@ -269,7 +291,7 @@ export function Detail({ model, onOpen, onPickTag }: DetailProps) {
 
       <section className="d-card d-tags">
         <header>
-          <span className="d-num">03</span>
+          <i />
           <b>标签</b>
           <em>// Tags</em>
         </header>
@@ -284,7 +306,7 @@ export function Detail({ model, onOpen, onPickTag }: DetailProps) {
 
       <section className="d-card d-related">
         <header>
-          <span className="d-num">04</span>
+          <i />
           <b>相关模型</b>
           <em>// Related Items</em>
           <button type="button" aria-label="关闭">
@@ -312,13 +334,13 @@ export function Detail({ model, onOpen, onPickTag }: DetailProps) {
                     aria-label="点赞"
                     onClick={(event) => {
                       event.stopPropagation()
-                      likes.add(item.id)
+                      likes.toggle(item.id)
                     }}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault()
                         event.stopPropagation()
-                        likes.add(item.id)
+                        likes.toggle(item.id)
                       }
                     }}
                   >

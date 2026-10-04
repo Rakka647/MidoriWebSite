@@ -47,8 +47,8 @@ export default function App() {
   const [canScroll, setCanScroll] = useState(false)
   const [canTop, setCanTop] = useState(false)
 
-  // 「返图展示」和「暗色模式」还没做，点了先弹出提示
-  const [notice, setNotice] = useState<string | null>(null)
+  // 「返图展示」和「暗色模式」还没做，点了先弹出提示；没闲鱼链接时也会用这个窗口
+  const [notice, setNotice] = useState<{ title: string; body: string } | null>(null)
 
   useEffect(() => {
     if (!notice) return
@@ -146,8 +146,8 @@ export default function App() {
         />
         <Header
           theme={theme}
-          onGallery={() => setNotice("返图展示")}
-          onToggleTheme={() => setNotice("暗色模式")}
+          onGallery={() => setNotice({ title: "返图展示", body: "这个功能还没有实现，敬请期待。" })}
+          onToggleTheme={() => setNotice({ title: "暗色模式", body: "这个功能还没有实现，敬请期待。" })}
           onHome={() => go({ name: "home" })}
         />
         <div key={screenKey(shown)} className={`screen${leaving ? " is-leaving" : ""}`}>
@@ -156,6 +156,12 @@ export default function App() {
               model={selected}
               onHome={() => go({ name: "home" })}
               onOpen={(id) => go({ name: "detail", id })}
+              onMissingLink={() =>
+                setNotice({
+                  title: "获取模型",
+                  body: "商品链接被闲鱼吃掉了(@﹏@)；请联系作者或耐心等待重新上传哦",
+                })
+              }
               onPickTag={(tag) => {
                 // ERP 标签对应首页的「全部 / erp模型 / 无erp模型」选项，其余标签进「更多筛选」
                 if (tag === ERP_YES || tag === ERP_NO) {
@@ -213,8 +219,8 @@ export default function App() {
         <div className="notice" role="dialog" aria-modal="true" onClick={() => setNotice(null)}>
           <div className="notice-box" onClick={(event) => event.stopPropagation()}>
             <i aria-hidden="true" />
-            <strong>{notice}</strong>
-            <p>这个功能还没有实现，敬请期待。</p>
+            <strong>{notice.title}</strong>
+            <p>{notice.body}</p>
             <button type="button" autoFocus onClick={() => setNotice(null)}>
               知道了
             </button>
