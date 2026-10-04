@@ -269,7 +269,7 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
   const [index, setIndex] = useState(0)
   const [query, setQuery] = useState("")
   const [onlyFav, setOnlyFav] = useState(false)
-  const [sort, setSort] = useState<SortMode>("publish-asc")
+  const [sort, setSort] = useState<SortMode>("publish-desc")
   const [sortOpen, setSortOpen] = useState(false)
   const sortRef = useRef<HTMLDivElement>(null)
   const favorites = useFavorites()
@@ -442,7 +442,7 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
           </div>
           <div className="chips">
             <button
-              className={`chip${onlyFav ? " is-on" : ""}`}
+              className={`chip chip-plain${onlyFav ? " is-on" : ""}`}
               type="button"
               aria-pressed={onlyFav}
               onClick={() => setOnlyFav(!onlyFav)}
@@ -454,23 +454,29 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
               {favoriteCount ? <em className="tag-count">{favoriteCount}</em> : null}
             </button>
             <button
-              className={`chip${tagOpen ? " is-on" : ""}`}
+              className={`chip chip-plain${tagOpen ? " is-on" : ""}`}
               type="button"
               aria-expanded={tagOpen}
               onClick={() => onTagOpen(!tagOpen)}
             >
-              ▽ 更多筛选
+              <svg className={`chip-ico${tagOpen || picked.length ? " is-on" : ""}`} viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 10h3v9H5zM10.5 5h3v14h-3zM16 13h3v6h-3z" />
+              </svg>
+              更多筛选
               {picked.length ? <em className="tag-count">{picked.length}</em> : null}
             </button>
             <div className="sort-drop" ref={sortRef}>
               <button
-                className={`chip chip-sort${sortOpen || sort !== "publish-asc" ? " is-on" : ""}`}
+                className="chip chip-plain chip-sort"
                 type="button"
                 aria-expanded={sortOpen}
                 aria-haspopup="listbox"
                 onClick={() => setSortOpen((open) => !open)}
               >
-                ▽ {SORT_OPTIONS.find((option) => option.id === sort)?.label}
+                <svg className={`chip-ico${sortOpen || sort !== "publish-desc" ? " is-on" : ""}`} viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M6 8.5h12L12 17z" />
+                </svg>
+                {SORT_OPTIONS.find((option) => option.id === sort)?.label}
               </button>
               {sortOpen ? (
                 <div className="sort-menu" role="listbox" aria-label="排序">
@@ -560,14 +566,14 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
                 <button
                   className="card-unfav"
                   type="button"
-                  aria-label="取消收藏"
-                  title="取消收藏"
+                  aria-label="已收藏"
+                  title="已收藏"
                   onClick={() => favorites.toggle(model.id)}
                 >
                   <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M12 3.6l2.5 5.3 5.8.7-4.3 4 1.1 5.7L12 16.7l-5.1 2.6 1.1-5.7-4.3-4 5.8-.7z" />
                   </svg>
-                  取消收藏
+                  已收藏
                 </button>
               ) : null}
             </article>

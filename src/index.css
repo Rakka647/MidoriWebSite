@@ -6031,7 +6031,8 @@ html {
   gap: 6px;
 }
 
-.chip-star {
+.chip-star,
+.chip-ico {
   width: 13px;
   height: 13px;
   fill: none;
@@ -6040,7 +6041,8 @@ html {
   stroke-linejoin: round;
 }
 
-.chip-star.is-on {
+.chip-star.is-on,
+.chip-ico.is-on {
   fill: currentColor;
 }
 
@@ -6052,6 +6054,19 @@ html {
   width: auto;
   min-width: 120px;
   padding: 0 12px;
+}
+
+.sheet .chip.chip-plain,
+.sheet .chip.chip-plain.is-on,
+.sheet .chip.chip-plain:hover {
+  background: transparent;
+  color: #3a3a3a;
+  box-shadow: none;
+}
+
+.sheet .chip.chip-plain.is-on::after,
+.sheet .chip.chip-plain:hover::after {
+  width: 0;
 }
 
 .sort-menu {
