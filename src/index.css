@@ -806,6 +806,8 @@ p {
 .card .frame img,
 .stage img,
 .rel .frame img {
+  transform: translateZ(0);
+  backface-visibility: hidden;
   transition: transform 0.8s var(--ease);
 }
 
@@ -3870,6 +3872,8 @@ body {
 }
 
 .sheet .card .frame img {
+  transform: translateZ(0);
+  backface-visibility: hidden;
   transition: transform 0.9s var(--ease);
 }
 
