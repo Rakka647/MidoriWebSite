@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --bg: #0e0e0e;
   --cream: #ece7de;
   --cream-dim: #b7b2a8;
@@ -2462,19 +2462,19 @@ body {
 
 .edge-lines .line-long {
   left: 0;
-  top: 64px;
+  top: 190px;
   background: #fff;
 }
 
 .edge-lines .line-mid {
   left: 36px;
-  top: 210px;
+  top: 340px;
   background: #d6ef45;
 }
 
 .edge-lines .line-short {
   left: 72px;
-  top: 360px;
+  top: 500px;
   background: #fff;
 }
 

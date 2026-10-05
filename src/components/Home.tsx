@@ -1,6 +1,7 @@
-import { Fragment, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react"
+﻿import { Fragment, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react"
 import { createPortal } from "react-dom"
 import {
+  bannerImage,
   bannerModels,
   bannerTags,
   displayPrice,
@@ -262,7 +263,7 @@ export function SideRail({ onCatalog }: { onCatalog: () => void }) {
 export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onErpFilter: setFilter, tagOpen, onTagOpen }: HomeProps) {
   // 横幅循环播放四个模型：管理员固定的（最多两个）+ 其余里编号最大的，每个模型取第一张图。
   const slides = useMemo<Slide[]>(
-    () => bannerModels(models).map((model) => ({ id: model.id, src: model.images[0], tags: bannerTags(model) })),
+    () => bannerModels(models).map((model) => ({ id: model.id, src: bannerImage(model), tags: bannerTags(model) })),
     [models],
   )
   const total = slides.length

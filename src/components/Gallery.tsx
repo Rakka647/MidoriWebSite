@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react"
+import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react"
 import { createPortal } from "react-dom"
 import { galleryLabel, type GalleryItem } from "../gallery"
 import type { Model } from "../models"
@@ -173,7 +173,7 @@ export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
   const margin = 280 * scale
   const tileW = Math.max(1600 * scale, view.w + margin * 2)
   const tileH = Math.max(1100 * scale, view.h + margin * 2)
-  const count = clamp(Math.round(((tileW * tileH) / (20000 * scale * scale)) / 6) * 6, 36, MAX_PHOTOS)
+  const count = clamp(Math.round(((tileW * tileH) / (25000 * scale * scale)) / 6) * 6, 36, MAX_PHOTOS)
 
   const slots = useMemo(() => buildSlots(count, items.length), [count, items.length])
   const lines = useMemo(() => buildLines(slots), [slots])

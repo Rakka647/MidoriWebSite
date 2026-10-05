@@ -1,4 +1,4 @@
-import raw from "./content/models.json" with { type: "json" }
+﻿import raw from "./content/models.json" with { type: "json" }
 import rawPool from "./content/tags.json" with { type: "json" }
 import rawBanner from "./content/banner.json" with { type: "json" }
 
@@ -35,7 +35,13 @@ export function fullImage(model: Pick<Model, "images" | "fullImages">, index: nu
 
 export const models = raw as Model[]
 
-const bannerConfig = rawBanner as { pinned?: string[] }
+const bannerConfig = rawBanner as { pinned?: string[]; images?: Record<string, number> }
+
+/** 首页横幅展示这个模型的哪一张图：后台选了就用选的，没选或已不存在就用封面。 */
+export function bannerImage(model: Pick<Model, "id" | "images">) {
+  const index = bannerConfig.images?.[model.id] ?? 0
+  return model.images[index] || model.images[0] || ""
+}
 
 /**
  * 首页横幅的四个模型：后台固定的（最多两个，按设置的顺序）排前面，
