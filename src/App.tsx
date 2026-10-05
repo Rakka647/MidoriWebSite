@@ -1,11 +1,14 @@
 import { useEffect, useLayoutEffect, useState } from "react"
 import { Header } from "./components/Header"
 import { Detail } from "./components/Detail"
+import { Gallery } from "./components/Gallery"
 import { Home, SideRail } from "./components/Home"
+import { galleryItems } from "./gallery"
 import { ERP_NO, ERP_YES, models, type ErpFilter } from "./models"
 
 type Screen =
   | { name: "home" }
+  | { name: "gallery" }
   | { name: "detail"; id: string }
 
 function readScreen(): Screen {
@@ -15,6 +18,7 @@ function readScreen(): Screen {
   } catch {
     // 地址栏里的 # 后面不是合法编码，当作没有
   }
+  if (hash === "gallery") return { name: "gallery" }
   // 只认真实存在的模型；模型被删掉后旧链接会回到首页
   if (hash && models.some((model) => model.id === hash)) return { name: "detail", id: hash }
   return { name: "home" }
@@ -22,6 +26,7 @@ function readScreen(): Screen {
 
 function hashFor(screen: Screen) {
   if (screen.name === "home") return ""
+  if (screen.name === "gallery") return "#gallery"
   return `#${screen.id}`
 }
 
@@ -33,6 +38,7 @@ function readTheme(): Theme {
 
 function screenKey(screen: Screen) {
   if (screen.name === "home") return "home"
+  if (screen.name === "gallery") return "gallery"
   return `detail:${screen.id}`
 }
 
@@ -47,7 +53,7 @@ export default function App() {
   const [canScroll, setCanScroll] = useState(false)
   const [canTop, setCanTop] = useState(false)
 
-  // 「返图展示」和「暗色模式」还没做，点了先弹出提示；没闲鱼链接时也会用这个窗口
+  // 「暗色模式」还没做，点了先弹出提示；没闲鱼链接时也会用这个窗口
   const [notice, setNotice] = useState<{ title: string; body: string } | null>(null)
 
   useEffect(() => {
@@ -114,8 +120,12 @@ export default function App() {
   const selected = shown.name === "detail" ? models.find((model) => model.id === shown.id) : null
 
   useEffect(() => {
-    document.title = selected ? `${selected.name} — MIDORI` : "M:D:R — MIDORI"
-  }, [selected])
+    document.title = selected
+      ? `${selected.name} — MIDORI`
+      : shown.name === "gallery"
+        ? "返图展示 — MIDORI"
+        : "M:D:R — MIDORI"
+  }, [selected, shown.name])
 
   return (
     <>
@@ -146,7 +156,7 @@ export default function App() {
         />
         <Header
           theme={theme}
-          onGallery={() => setNotice({ title: "返图展示", body: "这个功能还没有实现，敬请期待。" })}
+          onGallery={() => go({ name: "gallery" })}
           onToggleTheme={() => setNotice({ title: "暗色模式", body: "这个功能还没有实现，敬请期待。" })}
           onHome={() => go({ name: "home" })}
         />
@@ -175,7 +185,7 @@ export default function App() {
                 go({ name: "home" })
               }}
             />
-          ) : (
+          ) : shown.name === "gallery" ? null : (
             <Home
               models={models}
               picked={picked}
@@ -189,6 +199,14 @@ export default function App() {
           )}
         </div>
       </div>
+      {shown.name === "gallery" ? (
+        <Gallery
+          items={galleryItems}
+          models={models}
+          onHome={() => go({ name: "home" })}
+          onOpenModel={(id) => go({ name: "detail", id })}
+        />
+      ) : null}
       <div className="scroll-dock">
         <button
           className={`scroll-btn scroll-up${canTop ? " is-on" : ""}`}
