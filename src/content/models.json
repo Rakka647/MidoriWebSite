@@ -673,8 +673,8 @@
       "少女",
       "姐姐",
       "黑发",
-      "狐狸",
-      "已购折扣"
+      "已购折扣",
+      "猫猫"
     ],
     "author": "Midori",
     "download": "约95mb",
@@ -707,7 +707,7 @@
       }
     ],
     "fullImages": [
-      "/models/messy/mutrswai-f0-3e9c.webp",
+      "/models/messy/mutrswah-0-bd9b-full.webp",
       "/models/messy/mutqxb0g-1-f9bb-full.png",
       "/models/messy/mutqxb31-2-31bf-full.png",
       "/models/messy/mutqxb56-3-7592-full.png",
@@ -883,15 +883,25 @@
       "/models/momo/mutr40kq-8-d1d0.webp"
     ],
     "fullImages": [
-      "/models/momo/mutr40g3-f0-eb73.webp",
+      "/models/momo/mutr40g2-0-411c-full.webp",
       "/models/momo/mur8h28z-1-f149-full.png",
-      "/models/momo/mutr40ge-f2-0b5b.jpg",
-      "/models/momo/mutr40gl-f3-511c.jpg",
-      "/models/momo/mutr40gy-f4-bb71.jpg",
-      "/models/momo/mutr40h4-f5-cc19.jpg",
-      "/models/momo/mutr40in-f6-fdef.png",
-      "/models/momo/mutr40jv-f7-9989.png",
-      "/models/momo/mutr40lf-f8-6ec9.png"
+      "/models/momo/mutr40gb-2-f787-full.jpg",
+      "/models/momo/mutr40gi-3-0a56-full.jpg",
+      "/models/momo/mutr40gu-4-2386-full.jpg",
+      "/models/momo/mutr40h1-5-b62b-full.jpg",
+      "/models/momo/mutr40hx-6-7a55-full.png",
+      "/models/momo/mutr40je-7-4c27-full.png",
+      "/models/momo/mutr40kq-8-d1d0-full.png"
+    ],
+    "versions": [
+      {
+        "name": "无面捕版",
+        "price": "¥49.9"
+      },
+      {
+        "name": "面捕版",
+        "price": "¥59.9"
+      }
     ]
   },
   {
