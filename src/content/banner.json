@@ -2,5 +2,8 @@
   "pinned": [
     "meow",
     "nemu"
-  ]
+  ],
+  "images": {
+    "mangacia": 1
+  }
 }
