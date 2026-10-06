@@ -4,6 +4,7 @@
     "nemu"
   ],
   "images": {
-    "mangacia": 1
+    "mangacia": 1,
+    "memo": 1
   }
 }
