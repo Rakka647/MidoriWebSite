@@ -228,7 +228,7 @@ export function SideRail({ onCatalog }: { onCatalog: () => void }) {
             <path d="M3.5 19c.5-2.8 2.7-4.4 5.5-4.4s5 1.6 5.5 4.4" />
             <path d="M15 15.2c2.6-.3 4.8 1 5.5 3.8" />
           </svg>
-          <span>通知群</span>
+          <span>交流群</span>
         </button>
       </aside>
       {group ? (
@@ -238,16 +238,13 @@ export function SideRail({ onCatalog }: { onCatalog: () => void }) {
               ×
             </button>
             <i aria-hidden="true" />
-            <strong>通知群</strong>
-            <p>用微信或 QQ 扫码加入。</p>
+            <strong>交流群</strong>
+            <p className="qr-code">QQ群号：1128251942</p>
+            <p>每次上新、折扣、抽奖等活动都会第一时间在群里通知~</p>
             <div className="qr-row">
               <figure>
-                <img src="/qr/wechat.png" alt="微信二维码" />
-                <figcaption>微信</figcaption>
-              </figure>
-              <figure>
                 <img src="/qr/qq.png" alt="QQ 群二维码" />
-                <figcaption>QQ 群 1128251942</figcaption>
+                <figcaption>QQ 群</figcaption>
               </figure>
             </div>
             <button type="button" autoFocus onClick={() => setGroup(false)}>
@@ -369,7 +366,7 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
             <div className="showcase-copy">
               <i className="hero-bar" aria-hidden="true" />
               <h1>MIDORI</h1>
-              <p className="showcase-kicker">V R C h a t 成 品 模 型</p>
+              <p className="showcase-kicker">V R C h a t 模 型 展 示</p>
               <i className="hero-rule" aria-hidden="true" />
               <p className="showcase-id">
                 <b>闲鱼id：</b>Midori

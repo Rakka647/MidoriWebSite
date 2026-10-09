@@ -625,7 +625,7 @@ export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
         </button>
         <nav className="gal-nav">
           <button className="gal-link" type="button" onClick={onHome}>
-            <strong>成品模型</strong>
+            <strong>模型展示</strong>
             <small>AVATARS</small>
           </button>
           <button className="gal-link is-on" type="button" aria-current="page">
@@ -672,7 +672,9 @@ export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
                     aria-label="上一张"
                     onClick={() => setOpenIndex(((openIndex ?? 0) - 1 + items.length) % items.length)}
                   >
-                    ‹
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M14 6l-6 6 6 6" />
+                    </svg>
                   </button>
                   <button
                     className="gal-step is-next"
@@ -680,7 +682,9 @@ export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
                     aria-label="下一张"
                     onClick={() => setOpenIndex(((openIndex ?? 0) + 1) % items.length)}
                   >
-                    ›
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M10 6l6 6-6 6" />
+                    </svg>
                   </button>
                 </>
               ) : null}

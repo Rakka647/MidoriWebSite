@@ -16,13 +16,12 @@ export function Header({ theme, onToggleTheme, onGallery, onHome }: HeaderProps)
       </button>
       <nav className="bar-nav">
         <button className="bar-link is-on" type="button" onClick={onHome}>
-          <strong>成品模型</strong>
+          <strong>模型展示</strong>
           <small>AVATARS</small>
         </button>
         <button className="bar-link" type="button" onClick={onGallery}>
           <strong>返图展示</strong>
           <small>GALLERY</small>
-          <i />
         </button>
         <button className="bar-icon" type="button" aria-label="菜单">
           <span className="burger" />

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { displayPrice, erpTag, fullImage, modelTags, models, type Model } from "../models"
 import { serverLikes, useFavorites, useLikes } from "../favorites"
@@ -62,10 +62,28 @@ function StarIcon({ filled = false }: { filled?: boolean }) {
   )
 }
 
+function Chevron({ dir }: { dir: "up" | "down" | "left" | "right" }) {
+  const d =
+    dir === "up" ? "M6 14l6-6 6 6" : dir === "down" ? "M6 10l6 6 6-6" : dir === "left" ? "M14 6l-6 6 6 6" : "M10 6l6 6-6 6"
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d={d} />
+    </svg>
+  )
+}
+
+const THUMB_COPIES = 5
+const THUMB_SIZE = 54
+const THUMB_GAP = 6
+
 export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps) {
   const images = model.images.length ? model.images : [""]
-  const [shot, setShot] = useState(0)
+  const n = images.length
+  const [cursor, setCursor] = useState(() => n * 2)
   const [zoom, setZoom] = useState(false)
+  const [jump, setJump] = useState(false)
+  const [thumbMetric, setThumbMetric] = useState({ item: THUMB_SIZE, gap: THUMB_GAP, view: 0, row: false })
+  const thumbsRef = useRef<HTMLDivElement>(null)
   const [tips, setTips] = useState<{ like?: string; fav?: string }>({})
   const favorites = useFavorites()
   const saved = favorites.has(model.id)
@@ -78,12 +96,70 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
   const bodyPills = model.bodies?.length ? model.bodies : model.series ? [model.series] : []
   const pills = [...bodyPills, ...(erpTag(model.erp) ? [erpTag(model.erp) as string] : [])]
   const paragraphs = model.description.split("\n").map((line) => line.trim()).filter(Boolean)
-  const image = images[Math.min(shot, images.length - 1)]
-  const zoomImage = fullImage(model, Math.min(shot, images.length - 1)) || image
+  const shot = n ? ((cursor % n) + n) % n : 0
+  const image = images[Math.min(shot, n - 1)]
+  const zoomImage = fullImage(model, Math.min(shot, n - 1)) || image
+  const stride = thumbMetric.item + thumbMetric.gap
+  const trackOffset = cursor * stride - (thumbMetric.view / 2 - thumbMetric.item / 2)
+  const trackItems = n
+    ? Array.from({ length: n * THUMB_COPIES }, (_, pos) => ({
+        pos,
+        index: pos % n,
+        src: images[pos % n],
+      }))
+    : []
+
+  const move = useCallback((delta: number) => {
+    if (n <= 1 || !delta) return
+    setCursor((current) => current + delta)
+  }, [n])
 
   useEffect(() => {
-    setShot(0)
-  }, [model.id])
+    setJump(true)
+    setCursor(n * 2)
+  }, [model.id, n])
+
+  useLayoutEffect(() => {
+    if (!jump) return
+    const frame = requestAnimationFrame(() => setJump(false))
+    return () => cancelAnimationFrame(frame)
+  }, [jump])
+
+  function settleTrack() {
+    if (n <= 1) return
+    const lo = n
+    const hi = n * (THUMB_COPIES - 1)
+    if (cursor >= lo && cursor < hi) return
+    setJump(true)
+    setCursor(((cursor % n) + n) % n + n * 2)
+  }
+
+  useLayoutEffect(() => {
+    const el = thumbsRef.current
+    if (!el) return
+
+    const measure = () => {
+      const row = getComputedStyle(el).flexDirection === "row"
+      const thumb = el.querySelector(".d-thumb") as HTMLElement | null
+      const track = el.querySelector(".d-thumb-track") as HTMLElement | null
+      const view = el.querySelector(".d-thumb-view") as HTMLElement | null
+      const item = (row ? thumb?.offsetWidth : thumb?.offsetHeight) || THUMB_SIZE
+      const gap = track ? Number.parseFloat(getComputedStyle(track).gap) || THUMB_GAP : THUMB_GAP
+      const span = (row ? view?.clientWidth : view?.clientHeight) || 0
+      setThumbMetric({ item, gap, view: span, row })
+    }
+
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [n])
+
+  useEffect(() => {
+    if (n <= 1) return
+    const timer = window.setInterval(() => move(1), 6000)
+    return () => window.clearInterval(timer)
+  }, [n, model.id, shot, move])
 
   function flash(key: "like" | "fav", text: string) {
     setTips((current) => ({ ...current, [key]: text }))
@@ -92,16 +168,12 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
     }, 1400)
   }
 
-  function step(delta: number) {
-    setShot((current) => (current + delta + images.length) % images.length)
-  }
-
   useEffect(() => {
     if (!zoom) return
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setZoom(false)
-      else if (event.key === "ArrowLeft") setShot((current) => (current - 1 + images.length) % images.length)
-      else if (event.key === "ArrowRight") setShot((current) => (current + 1) % images.length)
+      else if (event.key === "ArrowLeft") move(-1)
+      else if (event.key === "ArrowRight") move(1)
     }
     const previous = document.body.style.overflow
     document.body.style.overflow = "hidden"
@@ -110,34 +182,38 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
       document.body.style.overflow = previous
       window.removeEventListener("keydown", onKey)
     }
-  }, [zoom, images.length])
+  }, [zoom, move])
 
   return (
     <main className="view d-page">
       <section className="d-hero">
         <div className="d-show">
-          <div className="d-thumbs">
-            <button className="d-thumb-nav" type="button" aria-label="上一张" onClick={() => step(-1)}>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M6 14l6-6 6 6" />
-              </svg>
+          <div className="d-thumbs" ref={thumbsRef}>
+            <button className="d-thumb-nav" type="button" aria-label="上一张" onClick={() => move(-1)}>
+              <Chevron dir={thumbMetric.row ? "left" : "up"} />
             </button>
-            <div className="d-thumb-list">
-              {images.map((src, index) => (
-                <button
-                  key={`${src}-${index}`}
-                  className={`d-thumb${index === shot ? " is-on" : ""}`}
-                  type="button"
-                  onClick={() => setShot(index)}
-                >
-                  {src ? <img src={src} alt={`${model.name} ${index + 1}`} decoding="async" /> : null}
-                </button>
-              ))}
+            <div className="d-thumb-view">
+              <div
+                className={`d-thumb-track${jump ? " is-jump" : ""}`}
+                style={{ transform: thumbMetric.row ? `translate3d(${-trackOffset}px,0,0)` : `translate3d(0,${-trackOffset}px,0)` }}
+                onTransitionEnd={(event) => {
+                  if (event.target === event.currentTarget) settleTrack()
+                }}
+              >
+                {trackItems.map(({ pos, index, src }) => (
+                  <button
+                    key={pos}
+                    className={`d-thumb${pos === cursor ? " is-on" : ""}`}
+                    type="button"
+                    onClick={() => move(pos - cursor)}
+                  >
+                    {src ? <img src={src} alt={`${model.name} ${index + 1}`} decoding="async" /> : null}
+                  </button>
+                ))}
+              </div>
             </div>
-            <button className="d-thumb-nav" type="button" aria-label="下一张" onClick={() => step(1)}>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M6 10l6 6 6-6" />
-              </svg>
+            <button className="d-thumb-nav" type="button" aria-label="下一张" onClick={() => move(1)}>
+              <Chevron dir={thumbMetric.row ? "right" : "down"} />
             </button>
           </div>
 
@@ -374,10 +450,10 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
                     aria-label="上一张"
                     onClick={(event) => {
                       event.stopPropagation()
-                      step(-1)
+                      move(-1)
                     }}
                   >
-                    ‹
+                    <Chevron dir="left" />
                   </button>
                   <button
                     className="lightbox-nav is-next"
@@ -385,10 +461,10 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
                     aria-label="下一张"
                     onClick={(event) => {
                       event.stopPropagation()
-                      step(1)
+                      move(1)
                     }}
                   >
-                    ›
+                    <Chevron dir="right" />
                   </button>
                 </>
               ) : null}
