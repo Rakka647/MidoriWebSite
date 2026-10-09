@@ -9,9 +9,6 @@ export function Header({ theme, onToggleTheme, onGallery, onHome }: HeaderProps)
   return (
     <header className="header bar">
       <button className="brand" type="button" onClick={onHome}>
-        <span className="brand-mark">
-          <b>M : D : R</b>
-        </span>
         <span className="brand-meta">
           <strong>MIDORI</strong>
           <small>VRChat Avatar</small>

@@ -2067,6 +2067,7 @@ body {
   flex-direction: column;
   align-items: flex-start;
   line-height: 1.15;
+  text-align: left;
 }
 
 .brand-meta strong {
@@ -2880,7 +2881,6 @@ body {
   grid-template-columns: 58px minmax(0, 1.15fr) minmax(280px, 0.86fr);
   gap: 12px;
   align-items: stretch;
-  min-height: 520px;
 }
 
 .d-thumbs {
@@ -2888,7 +2888,6 @@ body {
   flex-direction: column;
   gap: 8px;
   height: 100%;
-  min-height: 520px;
 }
 
 .d-thumbs > .d-thumb-nav:last-child {
@@ -2935,7 +2934,7 @@ body {
 
 .d-thumb {
   position: relative;
-  height: 58px;
+  height: 77px;
   overflow: hidden;
 }
 
@@ -2963,14 +2962,17 @@ body {
 .d-stage {
   position: relative;
   margin: 0;
-  min-height: 520px;
   overflow: hidden;
   background: #141414;
 }
 
 .d-stage img {
-  position: absolute;
-  inset: 0;
+  position: static;
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
 }
 
 .d-count {
@@ -3352,9 +3354,8 @@ body {
     flex-direction: row;
   }
 
-  .d-buy,
-  .d-stage {
-    min-height: 420px;
+  .d-buy {
+    min-height: 0;
   }
 
   .d-rel-wrap {
@@ -3700,8 +3701,8 @@ body {
 
 .brand-meta strong {
   font-family: "Montserrat", "Noto Sans SC", sans-serif;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 800;
   letter-spacing: 0.12em;
 }
 
@@ -5565,7 +5566,7 @@ html {
     width: 100%;
     height: auto;
     max-height: none;
-    aspect-ratio: 6 / 5;
+    aspect-ratio: 3 / 4;
     object-fit: cover;
   }
 }
@@ -5676,6 +5677,7 @@ html {
 }
 
 .rail button + a::before,
+.rail a + a::before,
 .rail a + button::before {
   content: "";
   position: absolute;
@@ -5781,6 +5783,7 @@ html {
   }
 
   .rail button + a::before,
+  .rail a + a::before,
   .rail a + button::before {
     top: 10px;
     right: auto;
@@ -5952,6 +5955,10 @@ html {
     height: 48px;
   }
 
+  .d-thumb {
+    height: 64px;
+  }
+
   .d-thumb-nav {
     height: 36px;
   }
@@ -5978,7 +5985,7 @@ html {
     width: 100%;
     height: auto;
     max-height: none;
-    aspect-ratio: 6 / 5;
+    aspect-ratio: 3 / 4;
     object-fit: cover;
   }
 
@@ -6056,21 +6063,44 @@ html {
 
 .sheet .chip.chip-sort {
   width: auto;
-  min-width: 120px;
-  padding: 0 12px;
+  padding: 2px 4px;
+}
+
+.sheet .chips-plain {
+  gap: 2px;
 }
 
 .sheet .chip.chip-plain,
-.sheet .chip.chip-plain.is-on,
-.sheet .chip.chip-plain:hover {
+.sheet .chip.chip-plain.is-on {
+  width: auto;
+  min-width: 0;
+  height: auto;
+  padding: 2px 4px;
+  overflow: visible;
   background: transparent;
-  color: #3a3a3a;
+  color: #6a6a6a;
   box-shadow: none;
+}
+
+.sheet .chip.chip-plain:hover,
+.sheet .chip.chip-plain.is-on:hover {
+  background: transparent;
+  color: #111;
+  box-shadow: none;
+}
+
+.sheet .chip.chip-plain.is-on {
+  color: #111;
+  font-weight: 800;
 }
 
 .sheet .chip.chip-plain.is-on::after,
 .sheet .chip.chip-plain:hover::after {
   width: 0;
+}
+
+.sheet .chip.chip-sort {
+  min-width: 0;
 }
 
 .sort-menu {

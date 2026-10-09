@@ -75,10 +75,18 @@ export function displayPrice(model: Pick<Model, "price" | "versions">) {
   return model.price || model.versions?.find((version) => version.price)?.price || ""
 }
 
-/** 排序用的价格数字：取展示价里的第一个数字，没有价格排到最后。 */
+/** 排序用的价格数字：总价、各版本价里取最高的那个，没有价格排到最后。 */
 export function priceValue(model: Pick<Model, "price" | "versions">) {
-  const match = displayPrice(model).replace(/,/g, "").match(/(\d+(?:\.\d+)?)/)
-  return match ? Number(match[1]) : Number.POSITIVE_INFINITY
+  const texts = [model.price, ...(model.versions ?? []).map((version) => version.price)]
+  let highest = Number.NEGATIVE_INFINITY
+  for (const text of texts) {
+    if (!text) continue
+    for (const match of text.replace(/,/g, "").matchAll(/(\d+(?:\.\d+)?)/g)) {
+      const value = Number(match[1])
+      if (value > highest) highest = value
+    }
+  }
+  return highest > 0 ? highest : Number.POSITIVE_INFINITY
 }
 
 /** 横幅左下角：素体 + 颜色 + 除此以外的第一个标签。 */

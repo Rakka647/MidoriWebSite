@@ -15,10 +15,8 @@ function infoRows(model: Model) {
   return [
     ["作者", model.author || "Midori"],
     ["対応プラットフォーム", model.platform || "PC / VR (VRChat)"],
-    ["バージョン", "1.0.0"],
     ["ダウンロードサイズ", model.download || "—"],
-    ["VRAM 使用量（目安）", model.vram || "—"],
-    ["更新日", "—"],
+    ["VRAMサイズ", model.vram || "—"],
   ]
 }
 

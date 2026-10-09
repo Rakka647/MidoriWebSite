@@ -181,6 +181,7 @@ function erpBadge(erp: boolean | null) {
 }
 
 const SHOP_LINK = "https://www.goofish.com/personal?spm=a21ybx.home.nav.1.4c053da6GMjw4U"
+const BILI_LINK = "https://space.bilibili.com/3747568213297464"
 
 export function SideRail({ onCatalog }: { onCatalog: () => void }) {
   const [group, setGroup] = useState(false)
@@ -210,7 +211,7 @@ export function SideRail({ onCatalog }: { onCatalog: () => void }) {
           <span>闲鱼店铺</span>
           <em>↗</em>
         </a>
-        <button className="is-soon" type="button">
+        <a href={BILI_LINK} target="_blank" rel="noopener noreferrer">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <rect x="3.5" y="7" width="17" height="11" rx="2" />
             <path d="M8 4l3 3M16 4l-3 3" />
@@ -219,7 +220,7 @@ export function SideRail({ onCatalog }: { onCatalog: () => void }) {
           </svg>
           <span>B站账号</span>
           <em>↗</em>
-        </button>
+        </a>
         <button type="button" onClick={() => setGroup(true)}>
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="9" cy="9" r="2.8" />
@@ -441,7 +442,7 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
               无erp模型
             </button>
           </div>
-          <div className="chips">
+          <div className="chips chips-plain">
             <button
               className={`chip chip-plain${onlyFav ? " is-on" : ""}`}
               type="button"
