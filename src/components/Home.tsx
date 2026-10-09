@@ -548,7 +548,7 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
             <article key={model.id} className="card work">
               <button className="card-open" type="button" onClick={() => onOpen(model.id)}>
                 <span className="frame">
-                  {model.images[0] ? <img src={model.images[0]} alt={model.name} loading="lazy" decoding="async" /> : null}
+                  {model.images[0] ? <img src={model.images[0]} alt={model.name} decoding="async" /> : null}
                 </span>
                 <span className="work-meta">
                   <span className="work-name">

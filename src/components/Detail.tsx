@@ -131,7 +131,7 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
                 type="button"
                 onClick={() => setShot(index)}
               >
-                {src ? <img src={src} alt={`${model.name} ${index + 1}`} loading="lazy" decoding="async" /> : null}
+                {src ? <img src={src} alt={`${model.name} ${index + 1}`} decoding="async" /> : null}
               </button>
             ))}
           </div>
@@ -322,7 +322,7 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
           <div className="d-rel-row">
             {others.map((item) => (
               <button key={item.id} className="d-rel" type="button" onClick={() => onOpen(item.id)}>
-                <span className="d-rel-pic">{item.images[0] ? <img src={item.images[0]} alt={item.name} loading="lazy" decoding="async" /> : null}</span>
+                <span className="d-rel-pic">{item.images[0] ? <img src={item.images[0]} alt={item.name} decoding="async" /> : null}</span>
                 <span className="d-rel-meta">
                   <strong>{item.name}</strong>
                   <em>{displayPrice(item)}</em>
