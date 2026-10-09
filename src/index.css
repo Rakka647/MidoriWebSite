@@ -2878,16 +2878,30 @@ body {
 
 .d-hero {
   display: grid;
-  grid-template-columns: 58px minmax(0, 1.15fr) minmax(280px, 0.86fr);
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.86fr);
   gap: 12px;
-  align-items: stretch;
+  align-items: start;
+}
+
+.d-show {
+  position: relative;
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
 }
 
 .d-thumbs {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
   display: flex;
   flex-direction: column;
+  width: 58px;
   gap: 8px;
-  height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .d-thumbs > .d-thumb-nav:last-child {
@@ -2934,7 +2948,7 @@ body {
 
 .d-thumb {
   position: relative;
-  height: 77px;
+  height: 58px;
   overflow: hidden;
 }
 
@@ -2961,6 +2975,8 @@ body {
 
 .d-stage {
   position: relative;
+  grid-column: 2;
+  min-width: 0;
   margin: 0;
   overflow: hidden;
   background: #141414;
@@ -2971,7 +2987,7 @@ body {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 1 / 1;
   object-fit: cover;
 }
 
@@ -3057,7 +3073,7 @@ body {
 .d-buy {
   display: flex;
   flex-direction: column;
-  min-height: 520px;
+  min-height: 0;
   padding: 18px 22px 20px;
 }
 
@@ -3348,6 +3364,7 @@ body {
   .d-thumbs {
     flex-direction: row;
     align-items: center;
+    height: auto;
   }
 
   .d-thumb-list {
@@ -3963,7 +3980,7 @@ body {
 
 .d-buy {
   min-height: 0;
-  align-self: stretch;
+  align-self: start;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4357,6 +4374,14 @@ body {
     opacity 0.35s var(--ease),
     transform 0.35s var(--ease),
     background 0.25s var(--ease);
+}
+
+.scroll-up {
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+}
+
+.scroll-down {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% - 12px));
 }
 
 .scroll-btn.is-on,
@@ -5543,6 +5568,20 @@ html {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .d-show {
+    grid-template-columns: 1fr;
+  }
+
+  .d-thumbs {
+    position: static;
+    width: auto;
+    height: auto;
+  }
+
+  .d-stage {
+    grid-column: auto;
+  }
+
   .d-thumbs,
   .d-thumb-list,
   .d-buy,
@@ -5566,7 +5605,7 @@ html {
     width: 100%;
     height: auto;
     max-height: none;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 1 / 1;
     object-fit: cover;
   }
 }
@@ -5956,7 +5995,7 @@ html {
   }
 
   .d-thumb {
-    height: 64px;
+    height: 48px;
   }
 
   .d-thumb-nav {
@@ -5985,7 +6024,7 @@ html {
     width: 100%;
     height: auto;
     max-height: none;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 1 / 1;
     object-fit: cover;
   }
 
@@ -6281,6 +6320,10 @@ html.is-gallery body {
   overflow: hidden;
 }
 
+html.is-gallery .scroll-dock {
+  display: none;
+}
+
 .gal {
   position: fixed;
   z-index: 70;
@@ -6416,21 +6459,31 @@ html.is-gallery body {
   background: #d6ef45;
 }
 
-/* 中间那张白色标题牌 */
+/* 中间标题牌：细灰窗框 + 切角，不要右侧厚灰条 */
 .gal-card {
   position: absolute;
   z-index: 5;
   top: 50%;
   left: 50%;
-  width: clamp(270px, 25vw, 430px);
-  padding: 14px 16px 12px;
-  background: #f6f5f1;
+  width: min(440px, 86vw);
+  padding: 2px;
+  background: #5a5a5a;
   color: #111;
   transform: translate(-50%, -50%);
-  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 14px);
   pointer-events: none;
   transition: opacity 0.4s var(--ease);
   animation: galCard 0.8s var(--ease) 0.15s both;
+}
+
+.gal-card::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 7px;
+  height: 7px;
+  background: #d6ef45;
 }
 
 @keyframes galCard {
@@ -6441,63 +6494,94 @@ html.is-gallery body {
 }
 
 .gal.is-open .gal-card {
-  opacity: 0.2;
+  opacity: 0.18;
 }
 
-.gal-card-top,
-.gal-card-foot {
+.gal.is-card-min .gal-hint {
+  opacity: 0;
+}
+
+.gal-card-body {
+  padding: 18px 36px 16px 18px;
+  background: #f3f2ee;
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 12px);
+}
+
+.gal-card-x {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: #111;
+  font-size: 22px;
+  line-height: 1;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.gal-card-x:hover {
+  color: #888;
+}
+
+.gal-card-kicker,
+.gal-card-eng {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  color: #8a8a86;
+  gap: 8px;
+  margin: 0;
+  color: #9a9a94;
   font-family: "Montserrat", sans-serif;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.22em;
 }
 
-.gal-card-main {
-  display: flex;
-  gap: 14px;
-  margin: 14px 0 16px;
-}
-
-.gal-card-main i {
-  flex: none;
-  width: 4px;
+.gal-card-kicker i {
+  width: 5px;
+  height: 14px;
   background: #d6ef45;
 }
 
 .gal-card h1 {
-  margin: 0;
-  font-size: clamp(30px, 3.3vw, 54px);
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  margin: 10px 0 8px;
+  font-size: clamp(32px, 4vw, 46px);
   font-weight: 900;
-  line-height: 1.08;
+  line-height: 1;
   letter-spacing: 0.02em;
 }
 
-.gal-card p {
-  margin: 8px 0 0;
-  font-size: clamp(11px, 1vw, 14px);
+.gal-card h1 i {
+  flex: none;
+  width: 6px;
+  background: #d6ef45;
+}
+
+.gal-card-eng {
+  margin: 0 0 14px 16px;
+}
+
+.gal-card-sub {
+  margin: 0 0 0 16px;
+  font-size: 14px;
   font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .gal-card .gal-empty {
-  margin: 10px 0 0;
+  display: block;
+  margin: 10px 0 0 16px;
   color: #777;
   font-size: 12px;
   font-weight: 500;
 }
 
-.gal-scroll {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #111;
-  font-size: 7px;
-}
-
-.gal-scroll svg,
 .gal-hint svg {
   width: 14px;
   height: 14px;
@@ -6668,7 +6752,7 @@ html.is-gallery body {
   letter-spacing: 0.1em;
 }
 
-/* 点开一张图：左边大图，右边是谁发的、用了哪些模型 */
+/* 点开一张图：例图那种窗口（顶栏 @用户 / 日期，底下使用模型） */
 .gal-modal {
   position: absolute;
   z-index: 10;
@@ -6676,21 +6760,69 @@ html.is-gallery body {
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.55);
   animation: galIn 0.3s var(--ease) both;
 }
 
-.gal-panel {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1.75fr) minmax(220px, 1fr);
-  gap: 18px;
-  width: min(980px, 100%);
-  max-height: 100%;
-  padding: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.82);
-  background: #0a0a0a;
+.gal-win {
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  background: #111;
+  border: 1px solid #3a3a3a;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.55);
   animation: galPop 0.4s var(--ease) both;
+}
+
+.gal-win-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 34px;
+  padding: 0 2px 0 12px;
+  background: #1c1c1c;
+  color: #eee;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.gal-win-x {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 34px;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.gal-win-x:hover {
+  color: #d6ef45;
+}
+
+.gal-win-shot {
+  position: relative;
+  line-height: 0;
+  background: #111;
+}
+
+.gal-win-shot img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(1100px, calc(100vw - 34px));
+  max-height: min(78vh, 860px);
+  object-fit: contain;
+  vertical-align: top;
+}
+
+.gal-win-used {
+  padding: 10px 12px 12px;
+  background: #0e0e0e;
 }
 
 @keyframes galPop {
@@ -6702,21 +6834,6 @@ html.is-gallery body {
 
 .gal-shot {
   position: relative;
-  display: grid;
-  place-items: center;
-  align-self: start;
-  aspect-ratio: 5 / 4;
-  max-height: calc(100vh - 90px);
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  background: #000;
-}
-
-.gal-shot img {
-  display: block;
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
 }
 
 .gal-step {
@@ -6745,7 +6862,7 @@ html.is-gallery body {
   right: 10px;
 }
 
-.gal-shot:hover .gal-step,
+.gal-win-shot:hover .gal-step,
 .gal-step:focus-visible {
   opacity: 1;
 }
@@ -6971,31 +7088,25 @@ html.is-gallery body {
   }
 
   .gal-card {
-    width: min(72vw, 330px);
+    width: min(88vw, 400px);
+  }
+
+  .gal-card h1 {
+    font-size: 32px;
+  }
+
+  .gal-card-x {
+    top: 4px;
+    right: 6px;
   }
 
   .gal-modal {
-    align-items: start;
     padding: 12px;
     overflow: auto;
   }
 
-  .gal-panel {
-    grid-template-columns: 1fr;
-    gap: 14px;
-    margin: auto 0;
-  }
-
-  .gal-shot {
-    max-height: 56vh;
-  }
-
-  .gal-info {
-    overflow: visible;
-  }
-
-  .gal-x {
-    top: -4px;
+  .gal-win-shot img {
+    max-height: 62vh;
   }
 
   .gal-step {
@@ -7007,7 +7118,7 @@ html.is-gallery body {
   .gal,
   .gal-card,
   .gal-modal,
-  .gal-panel {
+  .gal-win {
     animation: none;
   }
 }
@@ -7021,4 +7132,61 @@ html.is-gallery body {
 
 .gal-comment.is-placeholder {
   color: rgba(255, 255, 255, 0.4);
+}
+
+.gal-dock {
+  position: absolute;
+  z-index: 8;
+  left: 24px;
+  bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px 10px 12px;
+  background: #f3f2ee;
+  color: #111;
+  cursor: pointer;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  animation: galDockIn 0.4s var(--ease) both;
+}
+
+.gal-dock-bar {
+  width: 4px;
+  height: 28px;
+  background: #d6ef45;
+}
+
+.gal-dock strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.gal-dock small {
+  display: block;
+  margin-top: 2px;
+  color: #7a7a76;
+  font-family: "Montserrat", sans-serif;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+}
+
+.gal-dock:hover {
+  background: #fff;
+}
+
+@keyframes galDockIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+}
+
+@media (max-width: 720px) {
+  .gal-dock {
+    left: 12px;
+    bottom: 72px;
+  }
 }

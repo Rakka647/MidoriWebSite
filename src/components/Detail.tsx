@@ -14,9 +14,9 @@ type DetailProps = {
 function infoRows(model: Model) {
   return [
     ["作者", model.author || "Midori"],
-    ["対応プラットフォーム", model.platform || "PC / VR (VRChat)"],
-    ["ダウンロードサイズ", model.download || "—"],
-    ["VRAMサイズ", model.vram || "—"],
+    ["支持平台", model.platform || "PC / VR (VRChat)"],
+    ["下载大小", model.download || "—"],
+    ["显存大小", model.vram || "—"],
   ]
 }
 
@@ -115,63 +115,65 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
   return (
     <main className="view d-page">
       <section className="d-hero">
-        <div className="d-thumbs">
-          <button className="d-thumb-nav" type="button" aria-label="上一张" onClick={() => step(-1)}>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M6 14l6-6 6 6" />
-            </svg>
-          </button>
-          <div className="d-thumb-list">
-            {images.map((src, index) => (
-              <button
-                key={`${src}-${index}`}
-                className={`d-thumb${index === shot ? " is-on" : ""}`}
-                type="button"
-                onClick={() => setShot(index)}
-              >
-                {src ? <img src={src} alt={`${model.name} ${index + 1}`} decoding="async" /> : null}
-              </button>
-            ))}
+        <div className="d-show">
+          <div className="d-thumbs">
+            <button className="d-thumb-nav" type="button" aria-label="上一张" onClick={() => step(-1)}>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 14l6-6 6 6" />
+              </svg>
+            </button>
+            <div className="d-thumb-list">
+              {images.map((src, index) => (
+                <button
+                  key={`${src}-${index}`}
+                  className={`d-thumb${index === shot ? " is-on" : ""}`}
+                  type="button"
+                  onClick={() => setShot(index)}
+                >
+                  {src ? <img src={src} alt={`${model.name} ${index + 1}`} decoding="async" /> : null}
+                </button>
+              ))}
+            </div>
+            <button className="d-thumb-nav" type="button" aria-label="下一张" onClick={() => step(1)}>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 10l6 6 6-6" />
+              </svg>
+            </button>
           </div>
-          <button className="d-thumb-nav" type="button" aria-label="下一张" onClick={() => step(1)}>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M6 10l6 6 6-6" />
-            </svg>
-          </button>
-        </div>
 
-        <figure
-          className={`d-stage${image ? " is-zoomable" : ""}`}
-          onClick={() => {
-            if (image) setZoom(true)
-          }}
-        >
-          {image ? <img src={image} alt={model.name} /> : null}
-          <span className="d-count">
-            {shot + 1} / {images.length}
-          </span>
-          <span className="d-expand" aria-hidden="true">
-            <i />
-            <i />
-            <i />
-            <i />
-          </span>
-          <span className="d-plus d-plus-tl">+</span>
-          <span className="d-plus d-plus-br">+</span>
-          <span className="d-mark">
-            M:D:R
-            <small>
-              VRCHAT
-              <br />
-              AVATAR
-              <br />
-              ORIGINAL
-              <br />
-              2025
-            </small>
-          </span>
-          <span className="d-sign">{model.name}</span>
-        </figure>
+          <figure
+            className={`d-stage${image ? " is-zoomable" : ""}`}
+            onClick={() => {
+              if (image) setZoom(true)
+            }}
+          >
+            {image ? <img src={image} alt={model.name} /> : null}
+            <span className="d-count">
+              {shot + 1} / {images.length}
+            </span>
+            <span className="d-expand" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+              <i />
+            </span>
+            <span className="d-plus d-plus-tl">+</span>
+            <span className="d-plus d-plus-br">+</span>
+            <span className="d-mark">
+              M:D:R
+              <small>
+                VRCHAT
+                <br />
+                AVATAR
+                <br />
+                ORIGINAL
+                <br />
+                2025
+              </small>
+            </span>
+            <span className="d-sign">{model.name}</span>
+          </figure>
+        </div>
 
         <aside className="d-buy">
           <p className="d-serial">/// {model.code || "#001"}</p>
@@ -203,9 +205,9 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
               }}
             >
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 4v11" />
-                <path d="m8 11 4 4 4-4" />
-                <path d="M5 19h14" />
+                <path d="M14 5h5v5" />
+                <path d="M19 5 10 14" />
+                <path d="M19 13v5H6V6h5" />
               </svg>
               获取模型
             </button>

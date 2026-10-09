@@ -149,6 +149,7 @@ function baseFilter(d: number) {
 export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
   const [view, setView] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }))
   const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const [cardMin, setCardMin] = useState(false)
 
   useEffect(() => {
     let timer = 0
@@ -526,10 +527,9 @@ export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
 
   const open = openIndex !== null ? items[openIndex] : null
   const used = open ? open.models.map((id) => models.find((model) => model.id === id)).filter((model): model is Model => Boolean(model)) : []
-  const avatar = used[0]?.images[0]
 
   return createPortal(
-    <div className={`gal${open ? " is-open" : ""}`}>
+    <div className={`gal${open ? " is-open" : ""}${cardMin ? " is-card-min" : ""}`}>
       <div
         ref={stageRef}
         className="gal-stage"
@@ -586,29 +586,34 @@ export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
         })}
       </div>
 
-      <div ref={cardRef} className="gal-card">
-        <div className="gal-card-top">
-          <span>MIDORI AVATARS</span>
-          <span>/ 01</span>
-        </div>
-        <div className="gal-card-main">
-          <i aria-hidden="true" />
-          <div>
-            <h1>返图展示</h1>
-            <p>来自使用 Midori 模型的大家</p>
+      {cardMin ? (
+        <button className="gal-dock" type="button" aria-label="展开标题" onClick={() => setCardMin(false)}>
+          <span className="gal-dock-bar" aria-hidden="true" />
+          <span>
+            <strong>返图展示</strong>
+            <small>GALLERY</small>
+          </span>
+        </button>
+      ) : (
+        <div ref={cardRef} className="gal-card">
+          <button className="gal-card-x" type="button" aria-label="收起标题" onClick={() => setCardMin(true)}>
+            ×
+          </button>
+          <div className="gal-card-body">
+            <p className="gal-card-kicker">
+              <i aria-hidden="true" />
+              MIDORI AVATARS
+            </p>
+            <h1>
+              <i aria-hidden="true" />
+              返图展示
+            </h1>
+            <span className="gal-card-eng">CUSTOMER PHOTOS</span>
+            <p className="gal-card-sub">来自使用 Midori 模型的大家</p>
+            {items.length === 0 ? <span className="gal-empty">还没有返图，敬请期待</span> : null}
           </div>
         </div>
-        <div className="gal-card-foot">
-          <span>CUSTOMER PHOTOS</span>
-          <span className="gal-scroll">
-            <svg viewBox="0 0 16 16" aria-hidden="true">
-              <path d="M8 1v14M1 8h14" />
-            </svg>
-            SCROLL / DRAG
-          </span>
-        </div>
-        {items.length === 0 ? <p className="gal-empty">还没有返图，敬请期待</p> : null}
-      </div>
+      )}
 
       <header className="gal-bar">
         <button className="gal-brand" type="button" onClick={onHome}>
@@ -648,8 +653,16 @@ export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
 
       {open ? (
         <div className="gal-modal" role="dialog" aria-modal="true" aria-label="返图详情" onClick={() => setOpenIndex(null)}>
-          <div className="gal-panel" key={open.id} onClick={(event) => event.stopPropagation()}>
-            <div className="gal-shot">
+          <div className="gal-win" key={open.id} onClick={(event) => event.stopPropagation()}>
+            <header className="gal-win-bar">
+              <span>
+                @{open.author} / {open.date}
+              </span>
+              <button className="gal-win-x" type="button" aria-label="关闭" autoFocus onClick={() => setOpenIndex(null)}>
+                ×
+              </button>
+            </header>
+            <div className="gal-win-shot">
               <img src={open.image} alt={`${open.author} 的返图`} />
               {items.length > 1 ? (
                 <>
@@ -672,44 +685,26 @@ export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
                 </>
               ) : null}
             </div>
-            <aside className="gal-info">
-              <button className="gal-x" type="button" aria-label="关闭" autoFocus onClick={() => setOpenIndex(null)}>
-                <svg viewBox="0 0 16 16" aria-hidden="true">
-                  <path d="M2 2l12 12M14 2L2 14" />
-                </svg>
-              </button>
-              <div className="gal-user">
-                <span className="gal-avatar">
-                  {avatar ? <img src={avatar} alt="" /> : <b>{open.author.slice(0, 1).toUpperCase()}</b>}
-                </span>
-                <div>
-                  <strong>{open.author}</strong>
-                  <small>{open.date}</small>
-                </div>
-              </div>
-              {/* 留言暂时用占位文字，之后再接 open.comment */}
-              <p className="gal-comment is-placeholder">留言内容占位文字，之后会显示用户的留言。</p>
-              {used.length ? (
-                <div className="gal-used">
-                  <h3>
-                    <i aria-hidden="true" />
-                    使用模型 <small>/ USED AVATAR</small>
-                  </h3>
-                  {used.map((model) => (
-                    <button key={model.id} className="gal-model" type="button" onClick={() => onOpenModel(model.id)}>
-                      {model.images[0] ? <img src={model.images[0]} alt="" /> : <span className="gal-model-ph" />}
-                      <span>
-                        <strong>{model.name}</strong>
-                        <small>by {model.author || "Midori"}</small>
-                      </span>
-                      <svg viewBox="0 0 16 16" aria-hidden="true">
-                        <path d="M6 3H3v10h10v-3M9 2h5v5M14 2L7 9" />
-                      </svg>
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-            </aside>
+            {used.length ? (
+              <footer className="gal-win-used gal-used">
+                <h3>
+                  <i aria-hidden="true" />
+                  使用模型 <small>/ USED AVATAR</small>
+                </h3>
+                {used.map((model) => (
+                  <button key={model.id} className="gal-model" type="button" onClick={() => onOpenModel(model.id)}>
+                    {model.images[0] ? <img src={model.images[0]} alt="" /> : <span className="gal-model-ph" />}
+                    <span>
+                      <strong>{model.name}</strong>
+                      <small>by {model.author || "Midori"}</small>
+                    </span>
+                    <svg viewBox="0 0 16 16" aria-hidden="true">
+                      <path d="M6 3H3v10h10v-3M9 2h5v5M14 2L7 9" />
+                    </svg>
+                  </button>
+                ))}
+              </footer>
+            ) : null}
           </div>
         </div>
       ) : null}
