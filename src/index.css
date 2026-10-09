@@ -709,7 +709,9 @@ p {
 }
 
 .card .frame {
-  aspect-ratio: 3 / 3.05;
+  /* 不用 aspect-ratio：Safari 15（iPadOS 15.5）里它和绝对定位的 img 会把图算没 */
+  height: 0;
+  padding-top: 101.67%;
 }
 
 .card:hover {
