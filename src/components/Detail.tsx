@@ -75,6 +75,62 @@ function Chevron({ dir }: { dir: "up" | "down" | "left" | "right" }) {
 const THUMB_COPIES = 5
 const THUMB_SIZE = 54
 const THUMB_GAP = 6
+const THUMB_PIXELS = 128
+const smallThumbCache = new Map<string, string>()
+
+async function makeSmallThumb(src: string) {
+  const image = new Image()
+  image.src = src
+  await image.decode()
+  const canvas = document.createElement("canvas")
+  canvas.width = THUMB_PIXELS
+  canvas.height = THUMB_PIXELS
+  const ctx = canvas.getContext("2d")
+  if (!ctx || !image.naturalWidth) return src
+  const scale = Math.max(THUMB_PIXELS / image.naturalWidth, THUMB_PIXELS / image.naturalHeight)
+  const width = image.naturalWidth * scale
+  const height = image.naturalHeight * scale
+  ctx.drawImage(image, (THUMB_PIXELS - width) / 2, (THUMB_PIXELS - height) / 2, width, height)
+  return canvas.toDataURL("image/webp", 0.72)
+}
+
+function useSmallThumbs(srcs: string[]) {
+  const [ready, setReady] = useState<Record<string, string>>(() => {
+    const map: Record<string, string> = {}
+    for (const src of srcs) {
+      const hit = smallThumbCache.get(src)
+      if (hit) map[src] = hit
+    }
+    return map
+  })
+
+  useEffect(() => {
+    let live = true
+    const unique = [...new Set(srcs.filter(Boolean))]
+    void (async () => {
+      for (const src of unique) {
+        if (smallThumbCache.has(src)) continue
+        try {
+          smallThumbCache.set(src, await makeSmallThumb(src))
+        } catch {
+          smallThumbCache.set(src, src)
+        }
+        if (!live) return
+        const map: Record<string, string> = {}
+        for (const item of unique) {
+          const hit = smallThumbCache.get(item)
+          if (hit) map[item] = hit
+        }
+        setReady(map)
+      }
+    })()
+    return () => {
+      live = false
+    }
+  }, [srcs])
+
+  return ready
+}
 
 export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps) {
   const images = model.images.length ? model.images : [""]
@@ -84,6 +140,8 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
   const [jump, setJump] = useState(false)
   const [thumbMetric, setThumbMetric] = useState({ item: THUMB_SIZE, gap: THUMB_GAP, view: 0, row: false })
   const thumbsRef = useRef<HTMLDivElement>(null)
+  const frozenTrack = useRef<{ offset: number; cursor: number } | null>(null)
+  const smallThumbs = useSmallThumbs(model.images)
   const [tips, setTips] = useState<{ like?: string; fav?: string }>({})
   const favorites = useFavorites()
   const saved = favorites.has(model.id)
@@ -101,6 +159,9 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
   const zoomImage = fullImage(model, Math.min(shot, n - 1)) || image
   const stride = thumbMetric.item + thumbMetric.gap
   const trackOffset = cursor * stride - (thumbMetric.view / 2 - thumbMetric.item / 2)
+  const listOffset = zoom ? (frozenTrack.current?.offset ?? trackOffset) : trackOffset
+  const listCursor = zoom ? (frozenTrack.current?.cursor ?? cursor) : cursor
+  const thumbReach = Math.max(6, Math.ceil((thumbMetric.view || 1) / Math.max(stride, 1)) + 3)
   const trackItems = n
     ? Array.from({ length: n * THUMB_COPIES }, (_, pos) => ({
         pos,
@@ -108,6 +169,18 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
         src: images[pos % n],
       }))
     : []
+
+  function openZoom() {
+    if (!image) return
+    frozenTrack.current = { offset: trackOffset, cursor }
+    setZoom(true)
+  }
+
+  function closeZoom() {
+    frozenTrack.current = null
+    setJump(true)
+    setZoom(false)
+  }
 
   const move = useCallback((delta: number) => {
     if (n <= 1 || !delta) return
@@ -126,7 +199,7 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
   }, [jump])
 
   function settleTrack() {
-    if (n <= 1) return
+    if (n <= 1 || zoom) return
     const lo = n
     const hi = n * (THUMB_COPIES - 1)
     if (cursor >= lo && cursor < hi) return
@@ -156,10 +229,10 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
   }, [n])
 
   useEffect(() => {
-    if (n <= 1) return
+    if (n <= 1 || zoom) return
     const timer = window.setInterval(() => move(1), 6000)
     return () => window.clearInterval(timer)
-  }, [n, model.id, shot, move])
+  }, [n, model.id, shot, move, zoom])
 
   function flash(key: "like" | "fav", text: string) {
     setTips((current) => ({ ...current, [key]: text }))
@@ -171,7 +244,7 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
   useEffect(() => {
     if (!zoom) return
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setZoom(false)
+      if (event.key === "Escape") closeZoom()
       else if (event.key === "ArrowLeft") move(-1)
       else if (event.key === "ArrowRight") move(1)
     }
@@ -194,8 +267,8 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
             </button>
             <div className="d-thumb-view">
               <div
-                className={`d-thumb-track${jump ? " is-jump" : ""}`}
-                style={{ transform: thumbMetric.row ? `translate3d(${-trackOffset}px,0,0)` : `translate3d(0,${-trackOffset}px,0)` }}
+                className={`d-thumb-track${jump || zoom ? " is-jump" : ""}`}
+                style={{ transform: thumbMetric.row ? `translate3d(${-listOffset}px,0,0)` : `translate3d(0,${-listOffset}px,0)` }}
                 onTransitionEnd={(event) => {
                   if (event.target === event.currentTarget) settleTrack()
                 }}
@@ -203,11 +276,20 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
                 {trackItems.map(({ pos, index, src }) => (
                   <button
                     key={pos}
-                    className={`d-thumb${pos === cursor ? " is-on" : ""}`}
+                    className={`d-thumb${pos === listCursor ? " is-on" : ""}`}
                     type="button"
                     onClick={() => move(pos - cursor)}
                   >
-                    {src ? <img src={src} alt={`${model.name} ${index + 1}`} decoding="async" /> : null}
+                    {src && smallThumbs[src] && Math.abs(pos - listCursor) <= thumbReach ? (
+                      <img
+                        src={smallThumbs[src]}
+                        alt={`${model.name} ${index + 1}`}
+                        width={THUMB_PIXELS}
+                        height={THUMB_PIXELS}
+                        decoding="async"
+                        draggable={false}
+                      />
+                    ) : null}
                   </button>
                 ))}
               </div>
@@ -219,9 +301,7 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
 
           <figure
             className={`d-stage${image ? " is-zoomable" : ""}`}
-            onClick={() => {
-              if (image) setZoom(true)
-            }}
+            onClick={openZoom}
           >
             {image ? <img src={image} alt={model.name} /> : null}
             <span className="d-count">
@@ -433,9 +513,9 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
 
       {zoom && zoomImage
         ? createPortal(
-            <div className="lightbox" role="dialog" aria-modal="true" onClick={() => setZoom(false)}>
+            <div className="lightbox" role="dialog" aria-modal="true" onClick={closeZoom}>
               <img src={zoomImage} alt={model.name} onClick={(event) => event.stopPropagation()} />
-              <button className="lightbox-close" type="button" aria-label="关闭" onClick={() => setZoom(false)}>
+              <button className="lightbox-close" type="button" aria-label="关闭" onClick={closeZoom}>
                 ×
               </button>
               {images.length > 1 ? (

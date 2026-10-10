@@ -2969,6 +2969,7 @@ body {
   position: relative;
   height: var(--thumb-size);
   overflow: hidden;
+  contain: paint;
 }
 
 .d-thumb.is-on {
