@@ -64,7 +64,7 @@ export function sanitizeDescription(raw: string) {
   let html = String(raw ?? "").replace(/\r\n/g, "\n").slice(0, 30000)
   if (!/<[a-z][\s\S]*>/i.test(html)) return html
   html = html.replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<!--[\s\S]*?-->/g, "")
-  html = html.replace(/<span\b([^>]*)>([\s\S]*?)<\/span>/gi, (full, attrs, inner) =>
+  html = html.replace(/<span\b([^>]*)>([\s\S]*?)<\/span>/gi, (_full, attrs, inner) =>
     /background/i.test(String(attrs)) ? `<mark>${inner}</mark>` : inner,
   )
   return html.replace(/<\/?([a-zA-Z0-9]+)(\s[^>]*)?>/g, (full, tag) => {
