@@ -149,6 +149,7 @@ function baseFilter(d: number) {
 export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
   const [view, setView] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }))
   const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const [shotReady, setShotReady] = useState(false)
   const [cardMin, setCardMin] = useState(false)
 
   useEffect(() => {
@@ -168,6 +169,10 @@ export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
     document.documentElement.classList.add("is-gallery")
     return () => document.documentElement.classList.remove("is-gallery")
   }, [])
+
+  useEffect(() => {
+    setShotReady(false)
+  }, [openIndex])
 
   // 画面比例：窄屏时图片整体缩小、数量也相应减少
   const scale = Math.round(clamp(view.w / 1280, 0.62, 1.1) * 20) / 20
@@ -662,8 +667,15 @@ export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
                 ×
               </button>
             </header>
-            <div className="gal-win-shot">
-              <img src={open.image} alt={`${open.author} 的返图`} />
+            <div className={`gal-win-shot${shotReady ? " is-ready" : ""}`}>
+              <img
+                src={open.image}
+                alt={`${open.author} 的返图`}
+                onLoad={() => setShotReady(true)}
+                ref={(node) => {
+                  if (node?.complete && node.naturalWidth) setShotReady(true)
+                }}
+              />
               {items.length > 1 ? (
                 <>
                   <button

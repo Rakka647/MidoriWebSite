@@ -2952,7 +2952,6 @@ body {
 }
 
 .d-thumb-nav svg,
-.d-rel-arrow svg,
 .d-get svg,
 .d-fav svg,
 .d-rel-meta svg {
@@ -2986,7 +2985,6 @@ body {
 }
 
 .d-thumb-nav:hover,
-.d-rel-arrow:hover,
 .d-fav:hover {
   border-color: #fff;
   color: #fff;
@@ -3328,19 +3326,28 @@ body {
 
 .d-rel-wrap {
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr) 42px;
-  gap: 10px;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: stretch;
 }
 
-.d-rel-arrow {
-  display: grid;
-  width: 42px;
-  height: 42px;
-  place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 50%;
-  color: #fff;
+.d-home {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  padding: 16px 11px;
+  border: 0;
+  background: #d6ef45;
+  color: #111;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  writing-mode: vertical-rl;
+}
+
+.d-home:hover {
+  background: #fff;
 }
 
 .d-rel-row {
@@ -3436,6 +3443,12 @@ body {
 
   .d-rel-wrap {
     grid-template-columns: 1fr;
+  }
+
+  .d-home {
+    min-height: 46px;
+    writing-mode: horizontal-tb;
+    letter-spacing: 0.08em;
   }
 
   .d-info div {
@@ -3684,19 +3697,6 @@ body {
 .d-tag-row button:hover {
   background: #d6ef45;
   border-color: #d6ef45;
-  color: #111;
-}
-
-.d-rel-arrow {
-  width: 44px;
-  height: 44px;
-  border: 0;
-  background: #fff;
-  color: #111;
-}
-
-.d-rel-arrow:hover {
-  background: #d6ef45;
   color: #111;
 }
 
@@ -5966,7 +5966,6 @@ html {
   .explore-plus,
   .bar-icon,
   .d-plus,
-  .d-rel-arrow,
   .d-card header button {
     display: none;
   }
@@ -6238,6 +6237,12 @@ html {
 
   .d-rel-wrap {
     grid-template-columns: 1fr;
+  }
+
+  .d-home {
+    min-height: 46px;
+    writing-mode: horizontal-tb;
+    letter-spacing: 0.08em;
   }
 
   .d-rel-row {
@@ -6952,7 +6957,7 @@ html.is-gallery .scroll-dock {
 .gal-win {
   display: flex;
   flex-direction: column;
-  width: max-content;
+  width: min(720px, calc(100vw - 40px));
   max-width: min(760px, calc(100vw - 40px));
   max-height: calc(100vh - 40px);
   overflow: auto;
@@ -6998,18 +7003,24 @@ html.is-gallery .scroll-dock {
 
 .gal-win-shot {
   position: relative;
-  line-height: 0;
-  background: #111;
+  display: grid;
+  place-items: center;
+  min-height: min(56vh, 520px);
+  background: #1a1a1a;
 }
 
 .gal-win-shot img {
   display: block;
-  width: auto;
+  width: 100%;
   height: auto;
-  max-width: min(720px, calc(100vw - 42px));
   max-height: min(72vh, 760px);
   object-fit: contain;
-  vertical-align: top;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+.gal-win-shot.is-ready img {
+  opacity: 1;
 }
 
 .gal-win-used {
@@ -7307,8 +7318,15 @@ html.is-gallery .scroll-dock {
     overflow: auto;
   }
 
+  .gal-win {
+    width: min(720px, calc(100vw - 24px));
+  }
+
+  .gal-win-shot {
+    min-height: min(48vh, 420px);
+  }
+
   .gal-win-shot img {
-    max-width: calc(100vw - 28px);
     max-height: 64vh;
   }
 

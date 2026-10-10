@@ -76,7 +76,7 @@ const THUMB_COPIES = 5
 const THUMB_SIZE = 54
 const THUMB_GAP = 6
 
-export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps) {
+export function Detail({ model, onHome, onOpen, onPickTag, onMissingLink }: DetailProps) {
   const images = model.images.length ? model.images : [""]
   const n = images.length
   const [cursor, setCursor] = useState(() => n * 2)
@@ -399,11 +399,6 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
           </button>
         </header>
         <div className="d-rel-wrap">
-          <button className="d-rel-arrow" type="button" aria-label="上一组">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M14 6l-6 6 6 6" />
-            </svg>
-          </button>
           <div className="d-rel-row">
             {others.map((item) => (
               <button key={item.id} className="d-rel" type="button" onClick={() => onOpen(item.id)}>
@@ -436,10 +431,8 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
               </button>
             ))}
           </div>
-          <button className="d-rel-arrow" type="button" aria-label="下一组">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M10 6l6 6-6 6" />
-            </svg>
+          <button className="d-home" type="button" onClick={onHome}>
+            返回主页
           </button>
         </div>
       </section>
