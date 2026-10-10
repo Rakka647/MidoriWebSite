@@ -6943,7 +6943,7 @@ html.is-gallery .scroll-dock {
 .gal-win {
   display: flex;
   flex-direction: column;
-  width: min(720px, calc(100vw - 40px));
+  width: max-content;
   max-width: min(760px, calc(100vw - 40px));
   max-height: calc(100vh - 40px);
   overflow: auto;
@@ -6991,14 +6991,20 @@ html.is-gallery .scroll-dock {
   position: relative;
   display: grid;
   place-items: center;
-  min-height: min(56vh, 520px);
+  line-height: 0;
   background: #1a1a1a;
+}
+
+.gal-win-shot:not(.is-ready) {
+  min-width: min(560px, calc(100vw - 42px));
+  min-height: min(56vh, 520px);
 }
 
 .gal-win-shot img {
   display: block;
-  width: 100%;
+  width: auto;
   height: auto;
+  max-width: min(720px, calc(100vw - 42px));
   max-height: min(72vh, 760px);
   object-fit: contain;
   opacity: 0;
@@ -7295,15 +7301,13 @@ html.is-gallery .scroll-dock {
     overflow: auto;
   }
 
-  .gal-win {
-    width: min(720px, calc(100vw - 24px));
-  }
-
-  .gal-win-shot {
+  .gal-win-shot:not(.is-ready) {
+    min-width: min(280px, calc(100vw - 28px));
     min-height: min(48vh, 420px);
   }
 
   .gal-win-shot img {
+    max-width: calc(100vw - 28px);
     max-height: 64vh;
   }
 
