@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-import { displayPrice, erpTag, formatDescription, fullImage, modelTags, models, type Model } from "../models"
+import { displayPrice, erpTag, formatDescription, modelTags, models, type Model } from "../models"
 import { serverLikes, useFavorites, useLikes } from "../favorites"
 
 type DetailProps = {
@@ -156,7 +156,7 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
   const copyHtml = formatDescription(model.description)
   const shot = n ? ((cursor % n) + n) % n : 0
   const image = images[Math.min(shot, n - 1)]
-  const zoomImage = fullImage(model, Math.min(shot, n - 1)) || image
+  const [liteSrc, setLiteSrc] = useState(image)
   const stride = thumbMetric.item + thumbMetric.gap
   const trackOffset = cursor * stride - (thumbMetric.view / 2 - thumbMetric.item / 2)
   const listOffset = zoom ? (frozenTrack.current?.offset ?? trackOffset) : trackOffset
@@ -233,6 +233,35 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
     const timer = window.setInterval(() => move(1), 6000)
     return () => window.clearInterval(timer)
   }, [n, model.id, shot, move, zoom])
+
+  useEffect(() => {
+    const nearby = zoom ? [shot - 1, shot, shot + 1] : [shot]
+    for (const index of nearby) {
+      const src = images[((index % n) + n) % n]
+      if (!src) continue
+      const preload = new Image()
+      preload.src = src
+    }
+  }, [images, n, shot, zoom])
+
+  useEffect(() => {
+    if (!zoom) {
+      setLiteSrc(image)
+      return
+    }
+    let live = true
+    const preload = new Image()
+    preload.src = image
+    const apply = () => {
+      if (live) setLiteSrc(image)
+    }
+    if (preload.complete) apply()
+    else preload.onload = apply
+    return () => {
+      live = false
+      preload.onload = null
+    }
+  }, [image, zoom])
 
   function flash(key: "like" | "fav", text: string) {
     setTips((current) => ({ ...current, [key]: text }))
@@ -511,10 +540,10 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
         </div>
       </section>
 
-      {zoom && zoomImage
+      {zoom && liteSrc
         ? createPortal(
             <div className="lightbox" role="dialog" aria-modal="true" onClick={closeZoom}>
-              <img src={zoomImage} alt={model.name} onClick={(event) => event.stopPropagation()} />
+              <img src={liteSrc} alt={model.name} onClick={(event) => event.stopPropagation()} />
               <button className="lightbox-close" type="button" aria-label="关闭" onClick={closeZoom}>
                 ×
               </button>
