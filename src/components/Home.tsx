@@ -394,7 +394,7 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
               <p className="showcase-note">
                 欢迎光临Midori的模型屋 <span className="note-heart">💚</span>
                 <br />
-                点击查看详情可查看对应模型信息，
+                点击展示图片可查看对应模型信息，
                 <br />
                 点击获取模型即可跳转到闲鱼对应商品下单链接~
               </p>
