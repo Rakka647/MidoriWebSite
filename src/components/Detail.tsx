@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-import { displayPrice, erpTag, formatDescription, modelTags, models, type Model } from "../models"
+import { displayPrice, erpTag, formatDescription, fullImage, modelTags, models, type Model } from "../models"
 import { serverLikes, useFavorites, useLikes } from "../favorites"
 
 type DetailProps = {
@@ -156,6 +156,7 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
   const copyHtml = formatDescription(model.description)
   const shot = n ? ((cursor % n) + n) % n : 0
   const image = images[Math.min(shot, n - 1)]
+  const original = fullImage(model, Math.min(shot, n - 1)) || image
   const [liteSrc, setLiteSrc] = useState(image)
   const stride = thumbMetric.item + thumbMetric.gap
   const trackOffset = cursor * stride - (thumbMetric.view / 2 - thumbMetric.item / 2)
@@ -237,12 +238,19 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
   useEffect(() => {
     const nearby = zoom ? [shot - 1, shot, shot + 1] : [shot]
     for (const index of nearby) {
-      const src = images[((index % n) + n) % n]
-      if (!src) continue
-      const preload = new Image()
-      preload.src = src
+      const at = ((index % n) + n) % n
+      const preview = images[at]
+      const full = fullImage(model, at) || preview
+      if (preview) {
+        const warm = new Image()
+        warm.src = preview
+      }
+      if (zoom && full && full !== preview) {
+        const warm = new Image()
+        warm.src = full
+      }
     }
-  }, [images, n, shot, zoom])
+  }, [images, model, n, shot, zoom])
 
   useEffect(() => {
     if (!zoom) {
@@ -250,10 +258,12 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
       return
     }
     let live = true
+    setLiteSrc(image)
+    if (!original || original === image) return
     const preload = new Image()
-    preload.src = image
+    preload.src = original
     const apply = () => {
-      if (live) setLiteSrc(image)
+      if (live) setLiteSrc(original)
     }
     if (preload.complete) apply()
     else preload.onload = apply
@@ -261,7 +271,7 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
       live = false
       preload.onload = null
     }
-  }, [image, zoom])
+  }, [image, original, zoom])
 
   function flash(key: "like" | "fav", text: string) {
     setTips((current) => ({ ...current, [key]: text }))
