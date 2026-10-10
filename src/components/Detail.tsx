@@ -156,8 +156,7 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
   const copyHtml = formatDescription(model.description)
   const shot = n ? ((cursor % n) + n) % n : 0
   const image = images[Math.min(shot, n - 1)]
-  const original = fullImage(model, Math.min(shot, n - 1)) || image
-  const [liteSrc, setLiteSrc] = useState(image)
+  const zoomImage = fullImage(model, Math.min(shot, n - 1)) || image
   const stride = thumbMetric.item + thumbMetric.gap
   const trackOffset = cursor * stride - (thumbMetric.view / 2 - thumbMetric.item / 2)
   const listOffset = zoom ? (frozenTrack.current?.offset ?? trackOffset) : trackOffset
@@ -234,44 +233,6 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
     const timer = window.setInterval(() => move(1), 6000)
     return () => window.clearInterval(timer)
   }, [n, model.id, shot, move, zoom])
-
-  useEffect(() => {
-    const nearby = zoom ? [shot - 1, shot, shot + 1] : [shot]
-    for (const index of nearby) {
-      const at = ((index % n) + n) % n
-      const preview = images[at]
-      const full = fullImage(model, at) || preview
-      if (preview) {
-        const warm = new Image()
-        warm.src = preview
-      }
-      if (zoom && full && full !== preview) {
-        const warm = new Image()
-        warm.src = full
-      }
-    }
-  }, [images, model, n, shot, zoom])
-
-  useEffect(() => {
-    if (!zoom) {
-      setLiteSrc(image)
-      return
-    }
-    let live = true
-    setLiteSrc(image)
-    if (!original || original === image) return
-    const preload = new Image()
-    preload.src = original
-    const apply = () => {
-      if (live) setLiteSrc(original)
-    }
-    if (preload.complete) apply()
-    else preload.onload = apply
-    return () => {
-      live = false
-      preload.onload = null
-    }
-  }, [image, original, zoom])
 
   function flash(key: "like" | "fav", text: string) {
     setTips((current) => ({ ...current, [key]: text }))
@@ -550,10 +511,10 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
         </div>
       </section>
 
-      {zoom && liteSrc
+      {zoom && zoomImage
         ? createPortal(
             <div className="lightbox" role="dialog" aria-modal="true" onClick={closeZoom}>
-              <img src={liteSrc} alt={model.name} onClick={(event) => event.stopPropagation()} />
+              <img src={zoomImage} alt={model.name} onClick={(event) => event.stopPropagation()} />
               <button className="lightbox-close" type="button" aria-label="关闭" onClick={closeZoom}>
                 ×
               </button>
