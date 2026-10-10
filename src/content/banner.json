@@ -1,3 +1,20 @@
 {
-  "slides": []
+  "slides": [
+    {
+      "src": "/banner/mv1yq6h6-b-c785.webp",
+      "modelId": "meow"
+    },
+    {
+      "src": "/banner/mv1yq6hf-b-d865.webp",
+      "modelId": "nemu"
+    },
+    {
+      "src": "/banner/mv1yq6hh-b-3978.webp",
+      "modelId": "doll"
+    },
+    {
+      "src": "/banner/mv1yq6hi-b-2c1c.webp",
+      "modelId": "l"
+    }
+  ]
 }
