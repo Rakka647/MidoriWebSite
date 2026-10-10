@@ -35,35 +35,59 @@ export function fullImage(model: Pick<Model, "images" | "fullImages">, index: nu
 
 export const models = raw as Model[]
 
-const bannerConfig = rawBanner as { pinned?: string[]; images?: Record<string, number> }
+const bannerConfig = rawBanner as { slides?: { src?: string; modelId?: string }[] }
 
-/** 首页横幅展示这个模型的哪一张图：后台选了就用选的，没选或已不存在就用封面。 */
-export function bannerImage(model: Pick<Model, "id" | "images">) {
-  const index = bannerConfig.images?.[model.id] ?? 0
-  return model.images[index] || model.images[0] || ""
+export type BannerSlide = { id: string; src: string; tags: string[] }
+
+/** 首页横幅：只用后台手动上传的图，不再自动拿模型封面。 */
+export function bannerSlides(list: Model[], count = 4): BannerSlide[] {
+  const byId = new Map(list.map((model) => [model.id, model]))
+  const slides: BannerSlide[] = []
+  for (const item of bannerConfig.slides ?? []) {
+    if (slides.length >= count) break
+    const src = typeof item?.src === "string" ? item.src.trim() : ""
+    const model = typeof item?.modelId === "string" ? byId.get(item.modelId) : undefined
+    if (!src || !model) continue
+    slides.push({ id: model.id, src, tags: bannerTags(model) })
+  }
+  return slides
 }
 
-/**
- * 首页横幅的四个模型：后台固定的（最多两个，按设置的顺序）排前面，
- * 剩下的位置自动用其余模型里编号最靠后（最新）的补满。
- */
-export function bannerModels(list: Model[], pinned: string[] = bannerConfig.pinned ?? [], count = 4): Model[] {
-  const withImage = list.filter((model) => model.images[0])
-  const chosen: Model[] = []
-  for (const id of pinned) {
-    const model = withImage.find((item) => item.id === id)
-    if (model && !chosen.includes(model) && chosen.length < 2) chosen.push(model)
+const COPY_TAGS = new Set(["p", "br", "b", "strong", "i", "em", "u", "s", "mark", "div"])
+
+function escapeHtml(value: string) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+}
+
+/** 详情介绍只保留粗体 / 斜体 / 高亮等安全标签。 */
+export function sanitizeDescription(raw: string) {
+  let html = String(raw ?? "").replace(/\r\n/g, "\n").slice(0, 30000)
+  if (!/<[a-z][\s\S]*>/i.test(html)) return html
+  html = html.replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<!--[\s\S]*?-->/g, "")
+  html = html.replace(/<span\b([^>]*)>([\s\S]*?)<\/span>/gi, (full, attrs, inner) =>
+    /background/i.test(String(attrs)) ? `<mark>${inner}</mark>` : inner,
+  )
+  return html.replace(/<\/?([a-zA-Z0-9]+)(\s[^>]*)?>/g, (full, tag) => {
+    const name = String(tag).toLowerCase()
+    if (!COPY_TAGS.has(name)) return ""
+    if (name === "br") return full.startsWith("</") ? "" : "<br>"
+    if (full.startsWith("</")) return `</${name === "div" ? "p" : name}>`
+    if (name === "div") return "<p>"
+    return `<${name}>`
+  })
+}
+
+/** 详情页展示用：纯文本保留空行；带格式的 HTML 先消毒。 */
+export function formatDescription(raw: string) {
+  const text = sanitizeDescription(raw)
+  if (!text.trim()) return ""
+  if (!/<[a-z][\s\S]*>/i.test(text)) {
+    return text
+      .split("\n")
+      .map((line) => `<p>${escapeHtml(line) || "&nbsp;"}</p>`)
+      .join("")
   }
-  const serial = (model: Model) => {
-    const value = parseInt(model.code.replace(/\D/g, ""), 10)
-    return Number.isNaN(value) ? -1 : value
-  }
-  const rest = withImage
-    .map((model, order) => ({ model, order }))
-    .filter(({ model }) => !chosen.includes(model))
-    .sort((a, b) => serial(b.model) - serial(a.model) || b.order - a.order)
-    .map(({ model }) => model)
-  return [...chosen, ...rest].slice(0, count)
+  return text
 }
 
 export function displayName(model: Pick<Model, "name" | "series">) {

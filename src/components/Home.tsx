@@ -1,9 +1,7 @@
-﻿import { Fragment, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react"
+import { Fragment, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react"
 import { createPortal } from "react-dom"
 import {
-  bannerImage,
-  bannerModels,
-  bannerTags,
+  bannerSlides,
   displayPrice,
   matchesPicked,
   modelTags,
@@ -198,7 +196,7 @@ export function SideRail({ onCatalog }: { onCatalog: () => void }) {
   return createPortal(
     <>
       <aside className="rail">
-        <button type="button" aria-label="目录" onClick={onCatalog}>
+        <button className="rail-catalog" type="button" aria-label="目录" onClick={onCatalog}>
           <svg className="dots" viewBox="0 0 24 24" aria-hidden="true">
             {[5, 12, 19].flatMap((cy) => [5, 12, 19].map((cx) => <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="1.9" />))}
           </svg>
@@ -259,11 +257,7 @@ export function SideRail({ onCatalog }: { onCatalog: () => void }) {
 }
 
 export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onErpFilter: setFilter, tagOpen, onTagOpen }: HomeProps) {
-  // 横幅循环播放四个模型：管理员固定的（最多两个）+ 其余里编号最大的，每个模型取第一张图。
-  const slides = useMemo<Slide[]>(
-    () => bannerModels(models).map((model) => ({ id: model.id, src: bannerImage(model), tags: bannerTags(model) })),
-    [models],
-  )
+  const slides = useMemo<Slide[]>(() => bannerSlides(models), [models])
   const total = slides.length
   const [index, setIndex] = useState(0)
   const [query, setQuery] = useState("")
@@ -449,7 +443,8 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
               <svg className={`chip-star${onlyFav ? " is-on" : ""}`} viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 3.6l2.5 5.3 5.8.7-4.3 4 1.1 5.7L12 16.7l-5.1 2.6 1.1-5.7-4.3-4 5.8-.7z" />
               </svg>
-              我的收藏
+              <span className="chip-full">我的收藏</span>
+              <span className="chip-short">收藏</span>
               {favoriteCount ? <em className="tag-count">{favoriteCount}</em> : null}
             </button>
             <button
@@ -461,7 +456,8 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
               <svg className={`chip-ico${tagOpen || picked.length ? " is-on" : ""}`} viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M5 10h3v9H5zM10.5 5h3v14h-3zM16 13h3v6h-3z" />
               </svg>
-              更多筛选
+              <span className="chip-full">更多筛选</span>
+              <span className="chip-short">筛选</span>
               {picked.length ? <em className="tag-count">{picked.length}</em> : null}
             </button>
             <div className="sort-drop" ref={sortRef}>
@@ -475,7 +471,8 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
                 <svg className={`chip-ico${sortOpen || sort !== "publish-desc" ? " is-on" : ""}`} viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M6 8.5h12L12 17z" />
                 </svg>
-                {SORT_OPTIONS.find((option) => option.id === sort)?.label}
+                <span className="chip-full">{SORT_OPTIONS.find((option) => option.id === sort)?.label}</span>
+                <span className="chip-short">排序</span>
               </button>
               {sortOpen ? (
                 <div className="sort-menu" role="listbox" aria-label="排序">

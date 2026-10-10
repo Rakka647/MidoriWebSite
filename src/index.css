@@ -2611,6 +2611,10 @@ body {
   font-weight: 700;
 }
 
+.chip-short {
+  display: none;
+}
+
 .chip:hover {
   background: #111;
   color: #fff;
@@ -3255,6 +3259,31 @@ body {
   color: #3a3a3a;
   font-size: 14px;
   line-height: 1.75;
+  min-height: 1.75em;
+}
+
+.d-copy p:empty::before {
+  content: "\00a0";
+}
+
+.d-copy b,
+.d-copy strong {
+  font-weight: 800;
+}
+
+.d-copy i,
+.d-copy em {
+  font-style: italic;
+}
+
+.d-copy u {
+  text-underline-offset: 2px;
+}
+
+.d-copy mark {
+  background: #d6ef45;
+  color: #111;
+  padding: 0 0.2em;
 }
 
 .d-info div {
@@ -5971,17 +6000,60 @@ html {
     padding: 8px 0 0;
   }
 
+  .showcase {
+    padding-top: 4px;
+  }
+
+  .showcase-stage {
+    display: block;
+    position: relative;
+    height: var(--banner-h);
+  }
+
+  .photos {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--banner-h);
+  }
+
+  .showcase-copy {
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: min(78%, 280px);
+    height: 100%;
+    margin: 0;
+    padding: 14px 16px 16px;
+    background: linear-gradient(90deg, rgba(7, 7, 7, 0.9) 36%, rgba(7, 7, 7, 0.35) 72%, transparent);
+    pointer-events: none;
+  }
+
   .showcase-copy h1 {
-    font-size: 42px;
-    line-height: 0.9;
-    white-space: normal;
+    font-size: clamp(40px, 13vw, 58px);
+    line-height: 0.86;
+    white-space: nowrap;
   }
 
   .showcase-kicker,
   .showcase-id,
   .showcase-note {
     max-width: none;
-    font-size: 12px;
+    font-size: 11px;
+  }
+
+  .showcase-id {
+    margin-top: 12px;
+  }
+
+  .showcase-note {
+    margin-top: 6px;
+    line-height: 1.55;
   }
 
   .explore-row {
@@ -5990,14 +6062,16 @@ html {
   }
 
   .explore {
-    width: min(100%, 280px);
-    height: 46px;
-    font-size: 16px;
-    gap: 12px;
+    width: auto;
+    max-width: 100%;
+    height: 42px;
+    font-size: 15px;
+    gap: 10px;
+    pointer-events: auto;
   }
 
   body {
-    --banner-h: 210px;
+    --banner-h: min(58vw, 268px);
   }
 
   .photos {
@@ -6016,8 +6090,35 @@ html {
     width: 100%;
   }
 
+  .sheet-anchor {
+    margin-top: 10px;
+  }
+
   .sheet {
-    padding: 18px 14px 22px;
+    padding: 16px 12px 20px;
+  }
+
+  .sheet-head {
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .sheet-head h2 {
+    width: 100%;
+    font-size: 22px;
+  }
+
+  .finder {
+    width: 100%;
+    height: 38px;
+  }
+
+  .sheet-tools {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin: 14px 0 12px;
   }
 
   .grid {
@@ -6027,6 +6128,45 @@ html {
 
   .chips {
     flex-wrap: wrap;
+  }
+
+  .chip-full {
+    display: none;
+  }
+
+  .chip-short {
+    display: inline;
+  }
+
+  .rail-catalog {
+    display: none;
+  }
+
+  .rail,
+  .rail button,
+  .rail button:first-child,
+  .rail button:last-child,
+  .rail a,
+  .rail a:first-child {
+    background: #111;
+    color: #fff;
+    clip-path: none;
+  }
+
+  .rail {
+    border-top: 1px solid #2a2a2a;
+  }
+
+  .rail button:hover,
+  .rail a:hover {
+    background: #1c1c1c;
+  }
+
+  .rail button + button::before,
+  .rail button + a::before,
+  .rail a + a::before,
+  .rail a + button::before {
+    background: #2a2a2a;
   }
 
   .d-hero,

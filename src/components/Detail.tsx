@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-import { displayPrice, erpTag, fullImage, modelTags, models, type Model } from "../models"
+import { displayPrice, erpTag, formatDescription, fullImage, modelTags, models, type Model } from "../models"
 import { serverLikes, useFavorites, useLikes } from "../favorites"
 
 type DetailProps = {
@@ -95,7 +95,7 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
   // 名字下面的小标签：素体、ERP（点一下回首页按它筛选）
   const bodyPills = model.bodies?.length ? model.bodies : model.series ? [model.series] : []
   const pills = [...bodyPills, ...(erpTag(model.erp) ? [erpTag(model.erp) as string] : [])]
-  const paragraphs = model.description.split("\n").map((line) => line.trim()).filter(Boolean)
+  const copyHtml = formatDescription(model.description)
   const shot = n ? ((cursor % n) + n) % n : 0
   const image = images[Math.min(shot, n - 1)]
   const zoomImage = fullImage(model, Math.min(shot, n - 1)) || image
@@ -337,11 +337,7 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
             </button>
           </header>
           <div className="d-copy">
-            {paragraphs.length ? (
-              paragraphs.map((line, index) => <p key={index}>{line}</p>)
-            ) : (
-              <p>介绍还空着。</p>
-            )}
+            {copyHtml.trim() ? <div dangerouslySetInnerHTML={{ __html: copyHtml }} /> : <p>介绍还空着。</p>}
           </div>
         </article>
 
