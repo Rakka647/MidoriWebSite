@@ -622,7 +622,6 @@ export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
 
       <header className="gal-bar">
         <button className="gal-brand" type="button" onClick={onHome}>
-          <span className="gal-mark">M:D:R</span>
           <span className="gal-brand-meta">
             <strong>MIDORI</strong>
             <small>VRChat Avatar</small>

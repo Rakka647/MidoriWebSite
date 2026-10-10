@@ -5889,10 +5889,6 @@ html {
     max-height: 28vh;
   }
 
-  .qr-box > button:last-child {
-    width: 100%;
-  }
-
   .rail a,
   .rail a:first-child {
     flex: 1;
@@ -6805,16 +6801,6 @@ html.is-gallery .scroll-dock {
   color: #fff;
 }
 
-.gal-mark {
-  padding: 9px 16px;
-  background: #fff;
-  color: #111;
-  font-family: "Montserrat", sans-serif;
-  font-size: 17px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-}
-
 .gal-brand-meta {
   display: grid;
   gap: 3px;
@@ -7269,15 +7255,6 @@ html.is-gallery .scroll-dock {
 @media (max-width: 860px) {
   .gal-bar {
     padding: 14px 14px;
-  }
-
-  .gal-mark {
-    padding: 7px 11px;
-    font-size: 14px;
-  }
-
-  .gal-brand-meta {
-    display: none;
   }
 
   .gal-link {

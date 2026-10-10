@@ -262,7 +262,7 @@ export function SideRail({ onCatalog }: { onCatalog: () => void }) {
       {group ? (
         <div className="notice" role="dialog" aria-modal="true" onClick={() => setGroup(false)}>
           <div className="notice-box qr-box" onClick={(event) => event.stopPropagation()}>
-            <button className="qr-x" type="button" aria-label="关闭" onClick={() => setGroup(false)}>
+            <button className="qr-x" type="button" aria-label="关闭" autoFocus onClick={() => setGroup(false)}>
               ×
             </button>
             <i aria-hidden="true" />
@@ -275,9 +275,6 @@ export function SideRail({ onCatalog }: { onCatalog: () => void }) {
                 <figcaption>QQ 群</figcaption>
               </figure>
             </div>
-            <button type="button" autoFocus onClick={() => setGroup(false)}>
-              关闭
-            </button>
           </div>
         </div>
       ) : null}
