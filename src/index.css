@@ -6007,7 +6007,8 @@ html {
   .showcase-stage {
     display: block;
     position: relative;
-    height: var(--banner-h);
+    height: auto;
+    min-height: var(--banner-h);
   }
 
   .photos {
@@ -6017,17 +6018,18 @@ html {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: var(--banner-h);
+    height: auto;
   }
 
   .showcase-copy {
-    position: absolute;
+    position: relative;
     z-index: 3;
-    top: 0;
-    bottom: 0;
-    left: 0;
+    top: auto;
+    bottom: auto;
+    left: auto;
     width: min(78%, 280px);
-    height: 100%;
+    height: auto;
+    min-height: var(--banner-h);
     margin: 0;
     padding: 14px 16px 16px;
     background: linear-gradient(90deg, rgba(7, 7, 7, 0.9) 36%, rgba(7, 7, 7, 0.35) 72%, transparent);
@@ -6071,18 +6073,12 @@ html {
   }
 
   body {
-    --banner-h: min(58vw, 268px);
+    --banner-h: clamp(340px, 90vw, 440px);
   }
 
   .photos {
-    height: var(--banner-h);
-  }
-
-  .slot-a,
-  .slot-b,
-  .slot-enter,
-  .slot-exit {
-    display: none;
+    height: auto;
+    touch-action: pan-y;
   }
 
   .slot-main {
@@ -6138,7 +6134,7 @@ html {
     display: inline;
   }
 
-  .rail-catalog {
+  .rail button.rail-catalog {
     display: none;
   }
 
@@ -7395,5 +7391,26 @@ html.is-gallery .scroll-dock {
   .gal-dock {
     left: 12px;
     bottom: 72px;
+  }
+
+  /* 手机端横幅只露一张图，左右滑入滑出，不要把侧栏槽位 display:none 掉 */
+  .slot-a,
+  .slot-b,
+  .slot-enter {
+    left: 100%;
+    width: 100%;
+    opacity: 1;
+  }
+
+  .slot-exit {
+    left: -100%;
+    width: 100%;
+    opacity: 1;
+  }
+
+  .slot-main {
+    left: 0;
+    width: 100%;
+    opacity: 1;
   }
 }

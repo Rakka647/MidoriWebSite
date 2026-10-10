@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react"
+import { Fragment, useEffect, useMemo, useRef, useState, type KeyboardEvent, type TouchEvent } from "react"
 import { createPortal } from "react-dom"
 import {
   bannerSlides,
@@ -53,8 +53,19 @@ function Photo({ src }: { src: string }) {
   )
 }
 
-function BannerReel({ slides, index, onOpen }: { slides: Slide[]; index: number; onOpen: (id: string) => void }) {
+function BannerReel({
+  slides,
+  index,
+  onOpen,
+  onIndex,
+}: {
+  slides: Slide[]
+  index: number
+  onOpen: (id: string) => void
+  onIndex: (value: number) => void
+}) {
   const prevRef = useRef(index)
+  const touchRef = useRef<{ x: number; y: number } | null>(null)
   const [motion, setMotion] = useState<{ from: number; to: number; on: boolean; jump: boolean } | null>(null)
 
   useEffect(() => {
@@ -87,6 +98,25 @@ function BannerReel({ slides, index, onOpen }: { slides: Slide[]; index: number;
   }, [index, slides.length])
 
   const total = slides.length
+  const swipeProps =
+    total > 1
+      ? {
+          onTouchStart: (event: TouchEvent<HTMLDivElement>) => {
+            const point = event.changedTouches[0]
+            touchRef.current = { x: point.clientX, y: point.clientY }
+          },
+          onTouchEnd: (event: TouchEvent<HTMLDivElement>) => {
+            const start = touchRef.current
+            touchRef.current = null
+            if (!start) return
+            const point = event.changedTouches[0]
+            const dx = point.clientX - start.x
+            const dy = point.clientY - start.y
+            if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy) * 1.2) return
+            onIndex((index + (dx < 0 ? 1 : total - 1)) % total)
+          },
+        }
+      : {}
   if (!total) return <div className="photos" />
   // 点横幅上的任意一张图，直接打开它对应的模型。
   const openProps = (id: string) => ({
@@ -107,7 +137,7 @@ function BannerReel({ slides, index, onOpen }: { slides: Slide[]; index: number;
   if (!motion) {
     // index 已经变了、动画还没挂上时，继续画上一组，避免先闪出下一张。
     return (
-      <div className="photos">
+      <div className="photos" {...swipeProps}>
         {(["main", "a", "b"] as const).map((slot, offset) => {
           const slide = at(prevRef.current + offset)
           return figure(slide, slot, slide.id)
@@ -118,7 +148,7 @@ function BannerReel({ slides, index, onOpen }: { slides: Slide[]; index: number;
 
   if (motion.jump) {
     return (
-      <div className="photos">
+      <div className="photos" {...swipeProps}>
         {(["main", "a", "b"] as const).map((slot, offset) => {
           const slide = at(motion.from + offset)
           return figure(slide, slot, slide.id, motion.on ? " is-reel-out" : "")
@@ -134,7 +164,7 @@ function BannerReel({ slides, index, onOpen }: { slides: Slide[]; index: number;
   const startSlot = ["main", "a", "b", "enter"] as const
   const endSlot = ["exit", "main", "a", "b"] as const
   return (
-    <div className="photos">
+    <div className="photos" {...swipeProps}>
       {[0, 1, 2, 3].map((delta) => {
         const slide = at(motion.from + delta)
         const slot = motion.on ? endSlot[delta] : startSlot[delta]
@@ -278,7 +308,6 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
 
   useEffect(() => {
     if (total <= 1) return
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
     const timer = window.setInterval(() => setIndex((value) => (value + 1) % total), 4600)
     return () => window.clearInterval(timer)
   }, [total, index])
@@ -345,7 +374,7 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
       <div className="home-row">
         <section className="showcase">
           <div className="showcase-stage">
-            <BannerReel slides={slides} index={index} onOpen={onOpen} />
+            <BannerReel slides={slides} index={index} onOpen={onOpen} onIndex={setIndex} />
             <div className="pager">
               {slides.map((slide, dash) => (
                 <button
