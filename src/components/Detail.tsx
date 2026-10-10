@@ -75,62 +75,6 @@ function Chevron({ dir }: { dir: "up" | "down" | "left" | "right" }) {
 const THUMB_COPIES = 5
 const THUMB_SIZE = 54
 const THUMB_GAP = 6
-const THUMB_PIXELS = 128
-const smallThumbCache = new Map<string, string>()
-
-async function makeSmallThumb(src: string) {
-  const image = new Image()
-  image.src = src
-  await image.decode()
-  const canvas = document.createElement("canvas")
-  canvas.width = THUMB_PIXELS
-  canvas.height = THUMB_PIXELS
-  const ctx = canvas.getContext("2d")
-  if (!ctx || !image.naturalWidth) return src
-  const scale = Math.max(THUMB_PIXELS / image.naturalWidth, THUMB_PIXELS / image.naturalHeight)
-  const width = image.naturalWidth * scale
-  const height = image.naturalHeight * scale
-  ctx.drawImage(image, (THUMB_PIXELS - width) / 2, (THUMB_PIXELS - height) / 2, width, height)
-  return canvas.toDataURL("image/webp", 0.72)
-}
-
-function useSmallThumbs(srcs: string[]) {
-  const [ready, setReady] = useState<Record<string, string>>(() => {
-    const map: Record<string, string> = {}
-    for (const src of srcs) {
-      const hit = smallThumbCache.get(src)
-      if (hit) map[src] = hit
-    }
-    return map
-  })
-
-  useEffect(() => {
-    let live = true
-    const unique = [...new Set(srcs.filter(Boolean))]
-    void (async () => {
-      for (const src of unique) {
-        if (smallThumbCache.has(src)) continue
-        try {
-          smallThumbCache.set(src, await makeSmallThumb(src))
-        } catch {
-          smallThumbCache.set(src, src)
-        }
-        if (!live) return
-        const map: Record<string, string> = {}
-        for (const item of unique) {
-          const hit = smallThumbCache.get(item)
-          if (hit) map[item] = hit
-        }
-        setReady(map)
-      }
-    })()
-    return () => {
-      live = false
-    }
-  }, [srcs])
-
-  return ready
-}
 
 export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps) {
   const images = model.images.length ? model.images : [""]
@@ -141,7 +85,6 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
   const [thumbMetric, setThumbMetric] = useState({ item: THUMB_SIZE, gap: THUMB_GAP, view: 0, row: false })
   const thumbsRef = useRef<HTMLDivElement>(null)
   const frozenTrack = useRef<{ offset: number; cursor: number } | null>(null)
-  const smallThumbs = useSmallThumbs(model.images)
   const [tips, setTips] = useState<{ like?: string; fav?: string }>({})
   const favorites = useFavorites()
   const saved = favorites.has(model.id)
@@ -161,7 +104,6 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
   const trackOffset = cursor * stride - (thumbMetric.view / 2 - thumbMetric.item / 2)
   const listOffset = zoom ? (frozenTrack.current?.offset ?? trackOffset) : trackOffset
   const listCursor = zoom ? (frozenTrack.current?.cursor ?? cursor) : cursor
-  const thumbReach = Math.max(6, Math.ceil((thumbMetric.view || 1) / Math.max(stride, 1)) + 3)
   const trackItems = n
     ? Array.from({ length: n * THUMB_COPIES }, (_, pos) => ({
         pos,
@@ -280,16 +222,7 @@ export function Detail({ model, onOpen, onPickTag, onMissingLink }: DetailProps)
                     type="button"
                     onClick={() => move(pos - cursor)}
                   >
-                    {src && smallThumbs[src] && Math.abs(pos - listCursor) <= thumbReach ? (
-                      <img
-                        src={smallThumbs[src]}
-                        alt={`${model.name} ${index + 1}`}
-                        width={THUMB_PIXELS}
-                        height={THUMB_PIXELS}
-                        decoding="async"
-                        draggable={false}
-                      />
-                    ) : null}
+                    {src ? <img src={src} alt={`${model.name} ${index + 1}`} decoding="async" /> : null}
                   </button>
                 ))}
               </div>
