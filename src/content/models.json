@@ -546,14 +546,14 @@
     "description": "<p>蓝白色系会发光的赛博风少女～～</p><p><br></p><p>🏷️ 已购任意模型-10r</p><p><br></p><p>🟢&nbsp;衣服10套</p><p>🟢&nbsp;发型5种</p><p>🟢&nbsp;配饰7种 眼镜/光环（支持audiolink）/电子猫耳（支持audio link）/狼耳狼尾/眼角粒子效果/美甲/电子发饰（动画可开关）</p><p>🟢&nbsp;所有衣服共用一套开关，各个部分可根据需求随意控制开关</p><p>🟢&nbsp;全息投影材质全部可以一键切换玻璃材质～</p><p>🟢&nbsp;可开关亮度调节系统</p><p><br></p><p><b>玩具5个</b></p><p>🟢&nbsp;电子烟（自己和其他人都可以用～）</p><p>🟢&nbsp;电子宠物（会跟随你的电子小宠物，可以选择自动跟随也可以放在手上或头上，有手电筒功能，被其他人摸会缩成一团非常滴萌）</p><p>🟢&nbsp;像素爱心（开启状态下双手靠近会自动比心并且会有爱心动画出现在中间）</p><p>🟢HP系统（开启后被打会掉血，摸摸头可以回血，挂掉的话亲亲可以复活）</p><p>🟢发光匕首（左右手可分别开关，打开后张开手可转刀，握拳停止）</p><p><br></p><p>🟢&nbsp;菜单已美化，服装发型对应图片一目了然～</p><p>🟢胸部轮盘调节大小</p><p>🟢&nbsp;动态手势系统，随意切换比心/中指/狐狸等6种手势</p><p>🟢&nbsp;丝滑面捕+16种表情（表情都可以选轮盘，无需表情锁）</p><p>🟢&nbsp;MMD表情已修复</p><p><br></p><p><b>ERP功能5个</b>（仅无面捕版）</p><p>🟢&nbsp;可开关靠近亲亲表情</p><p>🟢&nbsp;可开关亲吻音效，自动检测触碰程度发出声音，可以深wen也可以啵啵～</p><p>🟢&nbsp;真吻系统，可以和有同样插件的其他模型拉丝，也可以固定在世界自己拉丝～</p><p>🟢&nbsp;共9点（有牛）的sps吸附（更好的dps且与dps通用）  贴图和物理全部精心调制，和身体完美契合，还你妈生牛！！</p><p>🟢&nbsp;pcs真实音效（随动作触发的人声、水声、撞击声、喷水水，全部可单独开关，助你成为erp高手） 还有自助模式，对方没有dps也能根据自身动作触发声音，真正做到想e就e！</p><p><br></p><p>🟢Gogoloco动作姿势插件，半身pc玩家通用。增加了16个拍照姿势在菜单里～pc也可以美美拍照捏！展示图全部是使用这些姿势在pc端进行拍照完成的</p>",
     "images": [
       "/models/neon/mutppupj-0-f64c.webp",
-      "/models/neon/mutppuqj-1-b790.webp",
-      "/models/neon/mutppurl-2-404f.webp",
-      "/models/neon/mutppurr-3-48c9.webp",
-      "/models/neon/mutppurz-4-3d07.webp",
-      "/models/neon/mutppus6-5-01f1.webp",
-      "/models/neon/mutppusc-6-468a.webp",
-      "/models/neon/mutppusl-7-d2ee.webp",
-      "/models/neon/mutppusr-8-a454.webp"
+      "/models/neon/mv3ajn5h-1-cd63.webp",
+      "/models/neon/mv3ajn5r-2-646d.webp",
+      "/models/neon/mv3ajn5z-3-b2ab.webp",
+      "/models/neon/mv3ajn6a-4-96f7.webp",
+      "/models/neon/mv3ajn6g-5-d955.webp",
+      "/models/neon/mv3ajn6o-6-d8ef.webp",
+      "/models/neon/mv3ajn6v-7-f265.webp",
+      "/models/neon/mv3ajn72-8-d5fe.webp"
     ],
     "versions": [
       {
@@ -571,14 +571,14 @@
     ],
     "fullImages": [
       "/models/neon/mutppupj-0-f64c-full.webp",
-      "/models/neon/mutppuqj-1-b790.webp",
-      "/models/neon/mutppurl-2-404f.webp",
-      "/models/neon/mutppurr-3-48c9.webp",
-      "/models/neon/mutppurz-4-3d07.webp",
-      "/models/neon/mutppus6-5-01f1.webp",
-      "/models/neon/mutppusc-6-468a.webp",
-      "/models/neon/mutppusl-7-d2ee.webp",
-      "/models/neon/mutppusr-8-a454.webp"
+      "/models/neon/mv3ajn5k-f1-b90a.webp",
+      "/models/neon/mv3ajn5u-f2-38b2.webp",
+      "/models/neon/mv3ajn66-f3-c77f.webp",
+      "/models/neon/mv3ajn6c-f4-ef04.webp",
+      "/models/neon/mv3ajn6i-f5-d29d.webp",
+      "/models/neon/mv3ajn6q-f6-15f8.webp",
+      "/models/neon/mv3ajn6x-f7-1d86.webp",
+      "/models/neon/mv3ajn74-f8-5007.webp"
     ]
   },
   {
@@ -883,6 +883,10 @@
       },
       {
         "name": "面捕版",
+        "price": "¥49.9"
+      },
+      {
+        "name": "面捕版+无面捕版",
         "price": "¥59.9"
       }
     ]
