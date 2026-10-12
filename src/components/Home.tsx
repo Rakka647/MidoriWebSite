@@ -209,19 +209,37 @@ function erpBadge(erp: boolean | null) {
 }
 
 const SHOP_LINK = "https://www.goofish.com/personal?spm=a21ybx.home.nav.1.4c053da6GMjw4U"
+const SHOP_LINK_2 = "https://m.tb.cn/h.jbbI4tZ?tk=7AkrTInWqbm"
 const BILI_LINK = "https://space.bilibili.com/3747568213297464"
+
+function ShopPicks() {
+  return (
+    <div className="shop-picks">
+      <a href={SHOP_LINK} target="_blank" rel="noopener noreferrer">
+        账号1
+      </a>
+      <a href={SHOP_LINK_2} target="_blank" rel="noopener noreferrer">
+        账号2
+      </a>
+    </div>
+  )
+}
 
 export function SideRail({ onCatalog }: { onCatalog: () => void }) {
   const [group, setGroup] = useState(false)
+  const [shop, setShop] = useState(false)
 
   useEffect(() => {
-    if (!group) return
+    if (!group && !shop) return
     const onKey = (event: globalThis.KeyboardEvent) => {
-      if (event.key === "Escape") setGroup(false)
+      if (event.key === "Escape") {
+        setGroup(false)
+        setShop(false)
+      }
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [group])
+  }, [group, shop])
 
   return createPortal(
     <>
@@ -231,14 +249,14 @@ export function SideRail({ onCatalog }: { onCatalog: () => void }) {
             {[5, 12, 19].flatMap((cy) => [5, 12, 19].map((cx) => <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="1.9" />))}
           </svg>
         </button>
-        <a href={SHOP_LINK} target="_blank" rel="noopener noreferrer">
+        <button type="button" onClick={() => setShop(true)}>
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M5 8h14l-1 11H6z" />
             <path d="M9 8V6.5a3 3 0 0 1 6 0V8" />
           </svg>
           <span>闲鱼店铺</span>
           <em>↗</em>
-        </a>
+        </button>
         <a href={BILI_LINK} target="_blank" rel="noopener noreferrer">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <rect x="3.5" y="7" width="17" height="11" rx="2" />
@@ -259,6 +277,19 @@ export function SideRail({ onCatalog }: { onCatalog: () => void }) {
           <span>交流群</span>
         </button>
       </aside>
+      {shop ? (
+        <div className="notice" role="dialog" aria-modal="true" onClick={() => setShop(false)}>
+          <div className="notice-box" onClick={(event) => event.stopPropagation()}>
+            <button className="qr-x" type="button" aria-label="关闭" autoFocus onClick={() => setShop(false)}>
+              ×
+            </button>
+            <i aria-hidden="true" />
+            <strong>闲鱼账号</strong>
+            <p>请选择要打开的店铺账号</p>
+            <ShopPicks />
+          </div>
+        </div>
+      ) : null}
       {group ? (
         <div className="notice" role="dialog" aria-modal="true" onClick={() => setGroup(false)}>
           <div className="notice-box qr-box" onClick={(event) => event.stopPropagation()}>
@@ -389,7 +420,14 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
               <p className="showcase-kicker">V R C h a t 模 型 展 示</p>
               <i className="hero-rule" aria-hidden="true" />
               <p className="showcase-id">
-                <b>闲鱼id：</b>Midori
+                <b>闲鱼id：</b>
+                <a href={SHOP_LINK} target="_blank" rel="noopener noreferrer">
+                  账号1
+                </a>
+                <i>/</i>
+                <a href={SHOP_LINK_2} target="_blank" rel="noopener noreferrer">
+                  账号2
+                </a>
               </p>
               <p className="showcase-note">
                 欢迎光临Midori的模型屋 <span className="note-heart">💚</span>

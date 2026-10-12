@@ -2312,6 +2312,24 @@ body {
   font-weight: 700;
 }
 
+.showcase-id a {
+  color: #fff;
+  margin-left: 8px;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.showcase-id a:hover {
+  color: #d6ef45;
+  border-color: #d6ef45;
+}
+
+.showcase-id i {
+  margin: 0 2px 0 8px;
+  color: rgba(255, 255, 255, 0.4);
+  font-style: normal;
+}
+
 .showcase-note {
   max-width: 300px;
   margin: 8px 0 0;
@@ -5615,6 +5633,29 @@ html {
 }
 
 .notice-box button:hover {
+  background: #d6ef45;
+  color: #111;
+}
+
+.shop-picks {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.shop-picks a {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  height: 40px;
+  background: #111;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.shop-picks a:hover {
   background: #d6ef45;
   color: #111;
 }
