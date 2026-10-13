@@ -285,7 +285,7 @@ export function SideRail({ onCatalog }: { onCatalog: () => void }) {
             </button>
             <i aria-hidden="true" />
             <strong>闲鱼账号</strong>
-            <p>请选择要打开的店铺账号</p>
+            <p>Midori大号被封了，26号之前购买模型请咨询Midori二号机哦(╥﹏╥)</p>
             <ShopPicks />
           </div>
         </div>
