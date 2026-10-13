@@ -216,10 +216,10 @@ function ShopPicks() {
   return (
     <div className="shop-picks">
       <a href={SHOP_LINK} target="_blank" rel="noopener noreferrer">
-        账号1
+        Midori
       </a>
       <a href={SHOP_LINK_2} target="_blank" rel="noopener noreferrer">
-        账号2
+        Midori二号机
       </a>
     </div>
   )
@@ -420,14 +420,7 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
               <p className="showcase-kicker">V R C h a t 模 型 展 示</p>
               <i className="hero-rule" aria-hidden="true" />
               <p className="showcase-id">
-                <b>闲鱼id：</b>
-                <a href={SHOP_LINK} target="_blank" rel="noopener noreferrer">
-                  账号1
-                </a>
-                <i>/</i>
-                <a href={SHOP_LINK_2} target="_blank" rel="noopener noreferrer">
-                  账号2
-                </a>
+                <b>闲鱼id：</b>Midori
               </p>
               <p className="showcase-note">
                 欢迎光临Midori的模型屋 <span className="note-heart">💚</span>

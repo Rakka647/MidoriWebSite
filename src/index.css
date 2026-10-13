@@ -2312,24 +2312,6 @@ body {
   font-weight: 700;
 }
 
-.showcase-id a {
-  color: #fff;
-  margin-left: 8px;
-  text-decoration: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-}
-
-.showcase-id a:hover {
-  color: #d6ef45;
-  border-color: #d6ef45;
-}
-
-.showcase-id i {
-  margin: 0 2px 0 8px;
-  color: rgba(255, 255, 255, 0.4);
-  font-style: normal;
-}
-
 .showcase-note {
   max-width: 300px;
   margin: 8px 0 0;
@@ -5648,11 +5630,13 @@ html {
   display: grid;
   place-items: center;
   height: 40px;
+  padding: 0 10px;
   background: #111;
   color: #fff;
   font-size: 14px;
   font-weight: 800;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .shop-picks a:hover {
