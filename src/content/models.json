@@ -1266,7 +1266,7 @@
     "code": "#22",
     "name": "Nunu",
     "series": "Plum",
-    "price": "¥49.9 ~ ¥59.9",
+    "price": "¥59.9 ~ ¥69.9",
     "erp": true,
     "bodies": [
       "Plum"
@@ -1298,11 +1298,11 @@
     "versions": [
       {
         "name": "无面捕版",
-        "price": "¥49.9"
+        "price": "¥59.9"
       },
       {
         "name": "面捕版",
-        "price": "¥59.9"
+        "price": "¥69.9"
       }
     ],
     "fullImages": [
