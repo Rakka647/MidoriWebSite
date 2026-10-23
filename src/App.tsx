@@ -126,7 +126,7 @@ export default function App() {
       ? `${selected.name} — MIDORI`
       : shown.name === "gallery"
         ? "返图展示 — MIDORI"
-        : "M:D:R — MIDORI"
+        : "MIDORI — 模型展示"
   }, [selected, shown.name])
 
   return (
