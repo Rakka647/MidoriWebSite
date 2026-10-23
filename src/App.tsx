@@ -50,6 +50,8 @@ export default function App() {
   const [picked, setPicked] = useState<string[]>([])
   const [tagOpen, setTagOpen] = useState(false)
   const [erpFilter, setErpFilter] = useState<ErpFilter>("all")
+  // 「erp模型」点第二次之后，卡片在默认图 / ERP 预设图之间切换；点「全部」才回默认图
+  const [erpAlt, setErpAlt] = useState(false)
   const [canScroll, setCanScroll] = useState(false)
   const [canTop, setCanTop] = useState(false)
 
@@ -177,9 +179,12 @@ export default function App() {
                 if (tag === ERP_YES || tag === ERP_NO) {
                   setPicked([])
                   setErpFilter(tag === ERP_YES ? "erp" : "plain")
+                  setErpAlt(false)
                 } else {
                   setPicked([tag])
                   setErpFilter("all")
+                  // 离开 erp 筛选时必须复位，否则卡片还停在预设图那一层，封面会整片空白
+                  setErpAlt(false)
                   setTagOpen(true)
                 }
                 go({ name: "home" })
@@ -191,7 +196,12 @@ export default function App() {
               picked={picked}
               onPicked={setPicked}
               erpFilter={erpFilter}
-              onErpFilter={setErpFilter}
+              onErpFilter={(next) => {
+                setErpFilter(next)
+                if (next !== "erp") setErpAlt(false)
+              }}
+              erpAlt={erpAlt}
+              onErpToggle={() => setErpAlt((on) => !on)}
               tagOpen={tagOpen}
               onTagOpen={setTagOpen}
               onOpen={(id) => go({ name: "detail", id })}

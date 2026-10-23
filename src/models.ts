@@ -27,6 +27,11 @@ export type Model = {
   images: string[]
   /** 点开展示图时用的原图；没有就用 images */
   fullImages?: string[]
+  /**
+   * 「erp模型」按钮点第二次时，模型一览卡片上换成的预设图。
+   * 后台单独上传；没有这张图时卡片显示占位符，不会退回封面。
+   */
+  erpImage?: string
 }
 
 export function fullImage(model: Pick<Model, "images" | "fullImages">, index: number) {

@@ -48,7 +48,8 @@
       "/models/brat/05.webp",
       "/models/brat/mutp60as-5-10e8-full.webp",
       "/models/brat/07.webp"
-    ]
+    ],
+    "erpImage": "/models/brat/mvkkaunt-erp-a28f.webp"
   },
   {
     "id": "emo",

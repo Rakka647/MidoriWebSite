@@ -19,6 +19,10 @@ type HomeProps = {
   onPicked: (tags: string[]) => void
   erpFilter: ErpFilter
   onErpFilter: (filter: ErpFilter) => void
+  /** 「erp模型」再点一次后：卡片换成每个模型自己的 ERP 预设图 */
+  erpAlt: boolean
+  /** 已经筛在 erp 上时再点一次：在默认图和 ERP 预设图之间切换 */
+  onErpToggle: () => void
   tagOpen: boolean
   onTagOpen: (open: boolean) => void
 }
@@ -314,7 +318,7 @@ export function SideRail({ onCatalog }: { onCatalog: () => void }) {
   )
 }
 
-export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onErpFilter: setFilter, tagOpen, onTagOpen }: HomeProps) {
+export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onErpFilter: setFilter, erpAlt, onErpToggle, tagOpen, onTagOpen }: HomeProps) {
   const slides = useMemo<Slide[]>(() => bannerSlides(models), [models])
   const total = slides.length
   const [index, setIndex] = useState(0)
@@ -341,6 +345,8 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
   }, [total, index])
 
   const levels = useMemo(() => tagLevels(models), [models])
+  // 只有同时满足「筛在 erp」和「预设图模式」才切到预设图；任何一个掉了都回默认封面，避免卡片空白
+  const erpMode = erpAlt && filter === "erp"
   const publishRank = useMemo(() => new Map(models.map((model, order) => [model.id, order])), [models])
 
   const visible = useMemo(() => {
@@ -483,7 +489,7 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
             <button className={`chip${filter === "all" ? " is-on" : ""}`} type="button" onClick={() => setFilter("all")}>
               全部
             </button>
-            <button className={`chip${filter === "erp" ? " is-on" : ""}`} type="button" onClick={() => setFilter("erp")}>
+            <button className={`chip${filter === "erp" ? " is-on" : ""}`} type="button" onClick={() => (filter === "erp" ? onErpToggle() : setFilter("erp"))}>
               erp模型
             </button>
             <button className={`chip${filter === "plain" ? " is-on" : ""}`} type="button" onClick={() => setFilter("plain")}>
@@ -599,8 +605,27 @@ export function Home({ models, onOpen, picked, onPicked, erpFilter: filter, onEr
           {pageItems.map((model) => (
             <article key={model.id} className="card work">
               <button className="card-open" type="button" onClick={() => onOpen(model.id)}>
-                <span className="frame">
-                  {model.images[0] ? <img src={model.images[0]} alt={model.name} decoding="async" /> : null}
+                <span className={`frame${erpMode ? " is-erp-alt" : ""}${filter === "erp" ? " is-erp-morph" : ""}`}>
+                  {/* 默认封面和 ERP 预设图各占一层，靠 opacity 交叉淡入淡出，不会硬切 */}
+                  <span className="frame-layer frame-layer-base">
+                    {model.images[0] ? <img src={model.images[0]} alt={model.name} decoding="async" /> : null}
+                  </span>
+                  <span className="frame-layer frame-layer-erp" aria-hidden={!erpMode}>
+                    {filter === "erp" ? (
+                      model.erpImage ? (
+                        <img src={model.erpImage} alt={erpMode ? model.name : ""} decoding="async" />
+                      ) : (
+                        <span className="frame-ph" aria-label="还没有上传 ERP 预设图">
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M4 5.5h16v13H4z" />
+                            <path d="M4 10l4.5-3 4 3.5 3-2 4.5 2.5" />
+                            <circle cx="9" cy="8.5" r="1.1" />
+                          </svg>
+                          <em>ERP 预设图</em>
+                        </span>
+                      )
+                    ) : null}
+                  </span>
                 </span>
                 <span className="work-meta">
                   <span className="work-name">
