@@ -32,6 +32,7 @@
       "/models/brat/04.webp",
       "/models/brat/05.webp",
       "/models/brat/mutp60as-5-10e8.webp",
+      "/models/brat/mvkt5h1x-6-16c5.webp",
       "/models/brat/07.webp"
     ],
     "versions": [
@@ -47,9 +48,10 @@
       "/models/brat/04.webp",
       "/models/brat/05.webp",
       "/models/brat/mutp60as-5-10e8-full.webp",
+      "/models/brat/mvkt5h1z-f6-40d3.webp",
       "/models/brat/07.webp"
     ],
-    "erpImage": "/models/brat/mvkkaunt-erp-a28f.webp"
+    "erpImage": "/models/brat/mvkt5h22-erp-eeb6.webp"
   },
   {
     "id": "emo",
@@ -222,7 +224,8 @@
       "/models/meow/mutpcpoh-8-92ec-full.webp",
       "/models/meow/mutpcpoq-9-baa8-full.webp"
     ],
-    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.19.21b46ac2a8WDQB&id=1091224385683&categoryId=50023914"
+    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.19.21b46ac2a8WDQB&id=1091224385683&categoryId=50023914",
+    "erpImage": "/models/meow/mvkt7pwn-erp-fff6.webp"
   },
   {
     "id": "kipfel",
@@ -302,15 +305,15 @@
     "platform": "PC/PCVR",
     "description": "<p>蓝白水色系的软妹airi！！香香软软还瑟瑟的ww</p><p><br></p><p><b><u>🏷️ 已购任意模型-5r，已购同价位模型-10r</u></b></p><p><br></p><p>面捕版无ERP，其余功能除手机不能拍照外全部一致</p><p><br></p><p>🟢 衣服14套</p><p>🟢 发型5种</p><p>🟢 配饰6种 眼镜/耳饰/饮料/美甲/跟随宠物/可开关可放置世界的洋伞</p><p><br></p><p><b>玩具4种</b></p><p>🟢 爱心发射器</p><p>🟢 所有人都可以互动的可喂食巧克力</p><p>🟢 可自拍的手机</p><p>🟢 多种相机滤镜（仅限vrc相机使用）</p><p><br></p><p>🟢 菜单已美化，服装发型对应图片一目了然～</p><p>🟢 胸部轮盘调节大小</p><p>🟢  动态手势系统，随意切换比心/中指/狐狸等6种手势</p><p>🟢 idex手势开关</p><p>🟢  加入了背光效果，光影更真实更有质感～</p><p><br></p><p>🟢 8个手势表情+15个轮盘表情</p><p>🟢 MMD表情已修复</p><p><br></p><p><b>ERP功能5种</b>（仅无面捕版）</p><p>🟢 可开关亲亲表情</p><p>🟢 可开关亲吻音效，自动检测触碰程度发出声音，可以深wen也可以啵啵～</p><p>🟢真吻系统，可以和有同样插件的其他模型拉丝，也可以固定在世界自己拉丝～</p><p>🟢共10点（有牛）的sps吸附（更好的dps且与dps通用）  贴图和物理全部精心调制，和身体完美契合，还你妈生牛！！</p><p>🟢pcs真实音效（随动作触发的水声、撞击声、喷水水，全部可单独开关，助你成为erp高手） 还有自助模式，对方没有dps也能根据自身动作触发声音，真正做到想e就e！</p><p><br></p><p>🟢 所有衣服共用一套开关，各个部分可根据需求随意控制开关</p><p><br></p><p>💚Gogoloco动作姿势插件 半身pc玩家通用</p>",
     "images": [
-      "/models/mizu/mutpgl19-0-9737.webp",
+      "/models/mizu/mutpgl51-3-dfec.webp",
       "/models/mizu/mutpgl3r-1-9ec0.webp",
       "/models/mizu/mutpgl4s-2-21c4.webp",
-      "/models/mizu/mutpgl51-3-dfec.webp",
       "/models/mizu/mutpgl5c-4-b5ca.webp",
       "/models/mizu/mutpgl6g-5-bad3.webp",
       "/models/mizu/mutpgl7t-6-9f5c.webp",
       "/models/mizu/mutpgl89-7-55a3.webp",
-      "/models/mizu/mutpgl8n-8-9dc2.webp"
+      "/models/mizu/mutpgl8n-8-9dc2.webp",
+      "/models/mizu/mutpgl19-0-9737.webp"
     ],
     "versions": [
       {
@@ -327,16 +330,17 @@
       }
     ],
     "fullImages": [
-      "/models/mizu/mutpgl19-0-9737-full.webp",
+      "/models/mizu/mutpgl51-3-dfec-full.webp",
       "/models/mizu/mutpgl3r-1-9ec0-full.webp",
       "/models/mizu/mutpgl4s-2-21c4-full.webp",
-      "/models/mizu/mutpgl51-3-dfec-full.webp",
       "/models/mizu/mutpgl5c-4-b5ca-full.webp",
       "/models/mizu/mutpgl6g-5-bad3-full.webp",
       "/models/mizu/mutpgl7t-6-9f5c-full.webp",
       "/models/mizu/mutpgl89-7-55a3-full.webp",
-      "/models/mizu/mutpgl8n-8-9dc2-full.webp"
-    ]
+      "/models/mizu/mutpgl8n-8-9dc2-full.webp",
+      "/models/mizu/mutpgl19-0-9737-full.webp"
+    ],
+    "erpImage": "/models/mizu/mvkt8fj9-erp-984b.webp"
   },
   {
     "id": "kuro",
@@ -402,7 +406,8 @@
       "/models/kuro/mutpjnu1-7-4758-full.webp",
       "/models/kuro/mutpjnu8-8-dae5-full.webp"
     ],
-    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.10.21b46ac2a8WDQB&id=1089247895419&categoryId=50023914"
+    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.10.21b46ac2a8WDQB&id=1089247895419&categoryId=50023914",
+    "erpImage": "/models/kuro/mvkt8pl1-erp-5079.webp"
   },
   {
     "id": "debiru",
@@ -464,7 +469,8 @@
       "/models/debiru/mutpm9id-7-b232-full.webp",
       "/models/debiru/mutpm9ir-8-de48-full.webp"
     ],
-    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.5.21b46ac2a8WDQB&id=1092301464106&categoryId=50023914"
+    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.5.21b46ac2a8WDQB&id=1092301464106&categoryId=50023914",
+    "erpImage": "/models/debiru/mvkt95p3-erp-4cff.webp"
   },
   {
     "id": "nemu",
@@ -583,7 +589,8 @@
       "/models/neon/mv3ajn6x-f7-1d86.webp",
       "/models/neon/mv3ajn74-f8-5007.webp"
     ],
-    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.16.21b46ac2a8WDQB&id=1089262431846&categoryId=50023914"
+    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.16.21b46ac2a8WDQB&id=1089262431846&categoryId=50023914",
+    "erpImage": "/models/neon/mvkt9ene-erp-bf0a.webp"
   },
   {
     "id": "manga-lapwing",
@@ -709,7 +716,8 @@
       "/models/messy/mutqxb6u-7-0c83-full.webp",
       "/models/messy/mutqxb73-8-033e-full.webp"
     ],
-    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.9.21b46ac2a8WDQB&id=1092297772831&categoryId=50023914"
+    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.9.21b46ac2a8WDQB&id=1092297772831&categoryId=50023914",
+    "erpImage": "/models/messy/mvkt9rqt-erp-4483.webp"
   },
   {
     "id": "goth",
@@ -771,7 +779,8 @@
       "/models/goth/mutqz1r4-7-b056-full.webp",
       "/models/goth/mutqz1r8-8-834d-full.webp"
     ],
-    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.13.21b46ac2a8WDQB&id=1090161170070&categoryId=50023914"
+    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.13.21b46ac2a8WDQB&id=1090161170070&categoryId=50023914",
+    "erpImage": "/models/goth/mvkt9yja-erp-0d3d.webp"
   },
   {
     "id": "hiki",
@@ -833,7 +842,8 @@
       "/models/hiki/mutr140x-6-bcc4-full.webp",
       "/models/hiki/mutr141w-7-28d1-full.webp",
       "/models/hiki/mutr1436-8-e7fa-full.webp"
-    ]
+    ],
+    "erpImage": "/models/hiki/mvkta6qv-erp-cfa6.webp"
   },
   {
     "id": "momo",
@@ -895,7 +905,8 @@
         "name": "面捕版+无面捕版",
         "price": "¥59.9"
       }
-    ]
+    ],
+    "erpImage": "/models/momo/mvktaik2-erp-8350.webp"
   },
   {
     "id": "tsukki",
@@ -959,7 +970,8 @@
       "/models/tsukki/mutr65dw-6-2970-full.webp",
       "/models/tsukki/mutr65f2-7-6902-full.webp",
       "/models/tsukki/mutr65go-8-f7f2-full.webp"
-    ]
+    ],
+    "erpImage": "/models/tsukki/mvksz8zy-erp-6e75.webp"
   },
   {
     "id": "game",
@@ -1020,7 +1032,8 @@
       "/models/game/mutr7xc0-f7-3085.webp",
       "/models/game/mutr7xc6-f8-7965.webp"
     ],
-    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.1.21b46ac2a8WDQB&id=1090167810799&categoryId=50023914"
+    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.1.21b46ac2a8WDQB&id=1090167810799&categoryId=50023914",
+    "erpImage": "/models/game/mvktaudr-erp-67ba.webp"
   },
   {
     "id": "l",
@@ -1084,7 +1097,8 @@
       "/models/l/mutr98na-7-26ac-full.webp",
       "/models/l/mutr98oc-8-9d92-full.webp"
     ],
-    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.15.21b46ac2a8WDQB&id=1091227973192&categoryId=50023914"
+    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.15.21b46ac2a8WDQB&id=1091227973192&categoryId=50023914",
+    "erpImage": "/models/l/mvktb2aa-erp-f7db.webp"
   },
   {
     "id": "cia",
@@ -1204,7 +1218,8 @@
       "/models/kura/mutrcxo7-7-5fb9-full.webp",
       "/models/kura/mutrcxoe-8-34ad-full.webp"
     ],
-    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.14.21b46ac2a8WDQB&id=1089235247509&categoryId=50023914"
+    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.14.21b46ac2a8WDQB&id=1089235247509&categoryId=50023914",
+    "erpImage": "/models/kura/mvktbgvh-erp-b27e.webp"
   },
   {
     "id": "mono",
@@ -1260,7 +1275,8 @@
       "/models/mono/mutrecdx-5-0cb4-full.webp",
       "/models/mono/mutrecee-6-e6cd-full.webp"
     ],
-    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.8.21b46ac2a8WDQB&id=1089243299125&categoryId=50023914"
+    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.8.21b46ac2a8WDQB&id=1089243299125&categoryId=50023914",
+    "erpImage": "/models/mono/mvktc7dj-erp-988c.webp"
   },
   {
     "id": "nunu",
@@ -1314,7 +1330,8 @@
       "/models/nunu/mutrg996-f4-f3d0.webp",
       "/models/nunu/mutrg9c4-f5-0517.webp",
       "/models/nunu/mutrg9ci-f6-8726.webp"
-    ]
+    ],
+    "erpImage": "/models/nunu/mvktcmul-erp-f827.webp"
   },
   {
     "id": "luna",
@@ -1370,7 +1387,8 @@
       "/models/luna/mutri5ma-f6-22ce.webp",
       "/models/luna/mutri5mh-f7-7405.webp",
       "/models/luna/mutri5mr-f8-0f19.webp"
-    ]
+    ],
+    "erpImage": "/models/luna/mvktcwyb-erp-3f5c.webp"
   },
   {
     "id": "shiro",
@@ -1425,7 +1443,8 @@
       "/models/shiro/mutrkb4z-f5-5e22.webp",
       "/models/shiro/mutrkb5a-f6-07b2.webp"
     ],
-    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.6.21b46ac2a8WDQB&id=1090150226242&categoryId=50023914"
+    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.6.21b46ac2a8WDQB&id=1090150226242&categoryId=50023914",
+    "erpImage": "/models/shiro/mvktd9k0-erp-6d9c.webp"
   },
   {
     "id": "memo",
@@ -1487,7 +1506,8 @@
       "/models/memo/mutrm37m-8-dd50-full.webp",
       "/models/memo/mutrm38p-9-61ff-full.webp"
     ],
-    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.11.21b46ac2a8WDQB&id=1092274784781&categoryId=50023914"
+    "link": "https://www.goofish.com/item?spm=a21ybx.personal.feeds.11.21b46ac2a8WDQB&id=1092274784781&categoryId=50023914",
+    "erpImage": "/models/memo/mvktdh11-erp-73e8.webp"
   },
   {
     "id": "mangacia",
