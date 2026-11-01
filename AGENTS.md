@@ -152,6 +152,7 @@ trash/                删除的图片和模型目录，误删可捞
 - 保存模型时若中途抛错，要回滚本次新写入的图片（`written` / `writtenOrig` 数组就是干这个的）。
 - 字段限制（服务端 `text(value, max)`）：`name` 80、`series` 80、`code` 16、`price` 60、`author` 60、`platform` 80、`download` 40、`vram` 40、`link` 600、`description` 30000；`versions` 最多 12 条；每级标签最多 40 个、单个 ≤24 字。
 - `erpImage`（ERP 预设图）走独立的上传路径：`undefined` = 沿用上一张，`""` = 删除，`data:image/...` = 新上传（服务端 `savePublicWebp` 存成 `<时间戳>-erp-<随机>.webp`）。它**不属于** `images`，要与 `images` / `fullImages` 一起进 `keepImages`，否则保存时会被当垃圾图移进 `trash/`。
+- ERP 预设图和详情图用**同一个裁剪器**（`imagetools.js` 的 `openEditor` / `renderDisplay`，比例 6:5）。裁剪记录存在 `originals/<id>/meta.json` 的保留键 `__erp__` 里（`{ original, crop, mark }`），保全原图才能在以后重新框选时不在已裁过的图上再裁。保存时额外传 `erpImageOriginal` / `erpImageCrop` / `erpImageMark`；`GET /api/models` 把它单独返回成 `erpMeta`。清理 `originals/` 时要把 `__erp__.original` 一起算进保留集合。
 - `id`（即 `public/models/<id>/` 目录名，创建后不能改）必须匹配 `^[a-z0-9][a-z0-9-]{0,48}$`。
 - 不填 `code` 时自动顺延成 `#NN`；`models.json` 按 `code` 里的数字排序。
 - CSP 是 `default-src 'self'`：字体、图标、脚本都不能外链，图片只允许 `self data: blob:`。
