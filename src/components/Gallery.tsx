@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react"
 import { createPortal } from "react-dom"
 import { galleryLabel, type GalleryItem } from "../gallery"
 import type { Model } from "../models"
@@ -146,6 +146,19 @@ function baseFilter(d: number) {
   return `blur(${((1 - t) * 3.2).toFixed(1)}px) brightness(${(0.5 + t * 0.5).toFixed(2)})`
 }
 
+// 返图弹窗里「下一张」是随机的：跳过当前这张，也跳过最近看过的几张，避免来回跳同两张。
+const RECENT_LIMIT = 8
+
+function randomAside(count: number, exclude: Set<number>) {
+  const pool: number[] = []
+  for (let index = 0; index < count; index += 1) {
+    if (!exclude.has(index)) pool.push(index)
+  }
+  // 可用数量不够时（图很少 / 刚看过一圈），退回全量随机，至少保证不是同一张
+  if (!pool.length) return Math.floor(Math.random() * count)
+  return pool[Math.floor(Math.random() * pool.length)]
+}
+
 export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
   const [view, setView] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }))
   const [openIndex, setOpenIndex] = useState<number | null>(null)
@@ -173,6 +186,29 @@ export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
   useEffect(() => {
     setShotReady(false)
   }, [openIndex])
+
+  // 弹窗里已经看过的图（新的在前），随机跳的时候避开它们
+  const recentRef = useRef<number[]>([])
+
+  /** 随机换一张返图：左右按钮和方向键都走这里。 */
+  const jumpRandom = useCallback(() => {
+    if (items.length <= 1) return
+    const exclude = new Set(recentRef.current)
+    if (openIndex !== null) exclude.add(openIndex)
+    const next = randomAside(items.length, exclude)
+    recentRef.current = [next, ...recentRef.current.filter((index) => index !== next)].slice(0, RECENT_LIMIT)
+    setOpenIndex(next)
+  }, [items.length, openIndex])
+
+  const openAt = useCallback((index: number) => {
+    recentRef.current = [index]
+    setOpenIndex(index)
+  }, [])
+
+  const closeShot = useCallback(() => {
+    recentRef.current = []
+    setOpenIndex(null)
+  }, [])
 
   // 画面比例：窄屏时图片整体缩小、数量也相应减少
   const scale = Math.round(clamp(view.w / 1280, 0.62, 1.1) * 20) / 20
@@ -431,9 +467,8 @@ export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
     const s = live.current
     const onKey = (event: KeyboardEvent) => {
       if (openIndex !== null) {
-        if (event.key === "Escape") setOpenIndex(null)
-        else if (items.length > 1 && event.key === "ArrowRight") setOpenIndex((value) => (((value ?? 0) + 1) % items.length))
-        else if (items.length > 1 && event.key === "ArrowLeft") setOpenIndex((value) => (((value ?? 0) - 1 + items.length) % items.length))
+        if (event.key === "Escape") closeShot()
+        else if (items.length > 1 && (event.key === "ArrowRight" || event.key === "ArrowLeft")) jumpRandom()
         return
       }
       const step = 900
@@ -444,7 +479,7 @@ export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [openIndex, items.length])
+  }, [openIndex, items.length, jumpRandom, closeShot])
 
   function hitTest(x: number, y: number) {
     const s = live.current
@@ -515,7 +550,7 @@ export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
     }
     if (!s.moved) {
       const hit = hitTest(event.clientX, event.clientY)
-      if (hit >= 0 && slots[hit].entry >= 0) setOpenIndex(slots[hit].entry)
+      if (hit >= 0 && slots[hit].entry >= 0) openAt(slots[hit].entry)
     }
     if (event.pointerType !== "mouse") {
       s.inside = false
@@ -656,13 +691,13 @@ export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
       </div>
 
       {open ? (
-        <div className="gal-modal" role="dialog" aria-modal="true" aria-label="返图详情" onClick={() => setOpenIndex(null)}>
+        <div className="gal-modal" role="dialog" aria-modal="true" aria-label="返图详情" onClick={closeShot}>
           <div className="gal-win" key={open.id} onClick={(event) => event.stopPropagation()}>
             <header className="gal-win-bar">
               <span>
                 @{open.author} / {open.date}
               </span>
-              <button className="gal-win-x" type="button" aria-label="关闭" autoFocus onClick={() => setOpenIndex(null)}>
+              <button className="gal-win-x" type="button" aria-label="关闭" autoFocus onClick={closeShot}>
                 ×
               </button>
             </header>
@@ -680,8 +715,9 @@ export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
                   <button
                     className="gal-step is-prev"
                     type="button"
-                    aria-label="上一张"
-                    onClick={() => setOpenIndex(((openIndex ?? 0) - 1 + items.length) % items.length)}
+                    aria-label="随机看一张"
+                    title="随机看一张"
+                    onClick={jumpRandom}
                   >
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M14 6l-6 6 6 6" />
@@ -690,8 +726,9 @@ export function Gallery({ items, models, onOpenModel, onHome }: GalleryProps) {
                   <button
                     className="gal-step is-next"
                     type="button"
-                    aria-label="下一张"
-                    onClick={() => setOpenIndex(((openIndex ?? 0) + 1) % items.length)}
+                    aria-label="随机看一张"
+                    title="随机看一张"
+                    onClick={jumpRandom}
                   >
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M10 6l6 6-6 6" />
