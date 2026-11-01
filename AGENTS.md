@@ -103,6 +103,7 @@ src/
 - 样式全在 `src/index.css`，类名前缀按区块划分：`d-`（详情）、`gal-`（返图）、`sheet-` / `chip` / `card`（一览）、`rail` / `bar`（框架）。**不要整篇重排 CSS**，只追加/局部修改，且优先复用已有的 CSS 变量（`--bg --cream --lime --line --ease --didot --sans ...`）。
 - 收藏/点赞只存 `localStorage`，键是 `midori-favorites` / `midori-likes`；`serverLikes()` 恒返回 `0`，接后端时只改这一个函数。
 - 首页分页固定 15 个/页（5×3）；返图最多渲染 220 张瓷砖，布局用固定种子 `mulberry32(20250721)`，**不要改成随机**，否则每次打开画面都会跳。
+- 返图弹窗里的左右按钮和 ←/→ 键都是「随机看一张」，不是顺序翻页。随机由 `randomAside()` 负责：跳过当前这张和最近看过的 8 张（`RECENT_LIMIT`），图少时会自动退化。**别改回 `±1` 取模**，那是刻意去掉的上传顺序。
 - 图片一律 `loading="lazy"` / `decoding="async"`；详情页缩略图轨道用 5 份副本做无限循环，边界逻辑别乱动。
 - 文案是中文（`lang="zh-CN"`），注释也写中文。改文案时保持全角标点与现有语气。
 - `tsconfig.app.json` 开了 `noUnusedLocals`、`noUnusedParameters`、`verbatimModuleSyntax`、`erasableSyntaxOnly`：类型导入必须 `import type`，不能写 `enum` / 参数属性。
@@ -133,6 +134,7 @@ trash/                删除的图片和模型目录，误删可捞
 | GET/POST | `/api/models` | 列表带 `imageMeta` / 保存（新建与更新同一个接口，靠 `isNew`） |
 | DELETE | `/api/models/:id` | 图片移进 `trash/` |
 | GET/POST | `/api/banner` | 最多 4 张，每张必须有图和对应 `modelId` |
+| GET/POST | `/api/rail` | 右侧栏「闲鱼店铺 / 交流群」弹窗的文字与店铺链接 |
 | GET | `/api/tags` | 三级标签池 |
 | POST | `/api/tags/delete` | 从池里删标签，同时从所有模型里摘掉 |
 | GET/POST | `/api/gallery` | 返图，最多关联 8 个模型 |
@@ -155,6 +157,7 @@ trash/                删除的图片和模型目录，误删可捞
 - CSP 是 `default-src 'self'`：字体、图标、脚本都不能外链，图片只允许 `self data: blob:`。
 - 默认只监听 `127.0.0.1`。**不要把后台和网站部署到同一个对外目录**。
 - `config.json`、`backups/`、`trash/`、`originals/` 都在 `.gitignore` 里，绝不能提交（`config.json` 含密码哈希）。
+- 右侧栏「闲鱼店铺 / 交流群」点开的文字存在网站的 `src/content/rail.json`，由后台「侧栏弹窗」页写入。二维码图片只从网站 `public/qr/` 里取，后台不上传图片，只改下面对应的说明文字。
 
 ---
 
@@ -188,6 +191,9 @@ trash/                删除的图片和模型目录，误删可捞
 
 `src/content/tags.json`：`{ bodies: string[], colors: string[], tags: string[] }`。
 `src/content/banner.json`：`{ slides: [{ src: "/banner/x.webp", modelId }] }`，最多 4 条。
+`src/content/rail.json`：右侧栏两个弹窗的文字，
+`{ shop: { title, body, links: [{ label, url }] }, group: { title, code, body, qrs: [{ src, caption }] } }`；
+`body` 里的换行会被拆成多段，`links` 最多 6 个，`qrs` 只认 `public/qr/` 下已有的图片。
 `src/content/gallery.json`：`[{ id, no, image, thumb?, author, date: "2026.10.10", comment, models: string[] }]`，新的在前。
 
 **约定**：这几个 JSON 由后台写入，正常不要手动编辑。确需手改时，保持字段顺序、缩进 2 空格、`models.json` 按 `code` 数字升序，并同步检查 `public/` 下引用的图片是否存在。

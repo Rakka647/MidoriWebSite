@@ -1,0 +1,27 @@
+{
+  "shop": {
+    "title": "闲鱼账号",
+    "body": "Midori大号被封了，26号之前购买模型请咨询Midori二号机哦(╥﹏╥)",
+    "links": [
+      {
+        "label": "Midori",
+        "url": "https://www.goofish.com/personal?spm=a21ybx.home.nav.1.4c053da6GMjw4U"
+      },
+      {
+        "label": "Midori二号机",
+        "url": "https://m.tb.cn/h.jbbI4tZ?tk=7AkrTInWqbm"
+      }
+    ]
+  },
+  "group": {
+    "title": "交流群",
+    "code": "QQ群号：1128251942",
+    "body": "每次上新、折扣、抽奖等活动都会第一时间在群里通知~",
+    "qrs": [
+      {
+        "src": "/qr/qq.png",
+        "caption": "QQ 群"
+      }
+    ]
+  }
+}

@@ -11,6 +11,7 @@ import {
   type Model,
 } from "../models"
 import { useFavorites } from "../favorites"
+import { railConfig, type RailLink } from "../rail"
 
 type HomeProps = {
   models: Model[]
@@ -212,19 +213,16 @@ function erpBadge(erp: boolean | null) {
   return "未标注"
 }
 
-const SHOP_LINK = "https://www.goofish.com/personal?spm=a21ybx.home.nav.1.4c053da6GMjw4U"
-const SHOP_LINK_2 = "https://m.tb.cn/h.jbbI4tZ?tk=7AkrTInWqbm"
 const BILI_LINK = "https://space.bilibili.com/3747568213297464"
 
-function ShopPicks() {
+function ShopPicks({ links }: { links: RailLink[] }) {
   return (
     <div className="shop-picks">
-      <a href={SHOP_LINK} target="_blank" rel="noopener noreferrer">
-        Midori
-      </a>
-      <a href={SHOP_LINK_2} target="_blank" rel="noopener noreferrer">
-        Midori二号机
-      </a>
+      {links.map((link) => (
+        <a key={`${link.label}-${link.url}`} href={link.url} target="_blank" rel="noopener noreferrer">
+          {link.label}
+        </a>
+      ))}
     </div>
   )
 }
@@ -288,9 +286,11 @@ export function SideRail({ onCatalog }: { onCatalog: () => void }) {
               ×
             </button>
             <i aria-hidden="true" />
-            <strong>闲鱼账号</strong>
-            <p>Midori大号被封了，26号之前购买模型请咨询Midori二号机哦(╥﹏╥)</p>
-            <ShopPicks />
+            <strong>{railConfig.shop.title}</strong>
+            {railConfig.shop.body.map((line, index) => (
+              <p key={index}>{line}</p>
+            ))}
+            <ShopPicks links={railConfig.shop.links} />
           </div>
         </div>
       ) : null}
@@ -301,14 +301,18 @@ export function SideRail({ onCatalog }: { onCatalog: () => void }) {
               ×
             </button>
             <i aria-hidden="true" />
-            <strong>交流群</strong>
-            <p className="qr-code">QQ群号：1128251942</p>
-            <p>每次上新、折扣、抽奖等活动都会第一时间在群里通知~</p>
+            <strong>{railConfig.group.title}</strong>
+            {railConfig.group.code ? <p className="qr-code">{railConfig.group.code}</p> : null}
+            {railConfig.group.body.map((line, index) => (
+              <p key={index}>{line}</p>
+            ))}
             <div className="qr-row">
-              <figure>
-                <img src="/qr/qq.png" alt="QQ 群二维码" />
-                <figcaption>QQ 群</figcaption>
-              </figure>
+              {railConfig.group.qrs.map((qr) => (
+                <figure key={qr.src}>
+                  <img src={qr.src} alt={qr.caption || "交流群二维码"} />
+                  {qr.caption ? <figcaption>{qr.caption}</figcaption> : null}
+                </figure>
+              ))}
             </div>
           </div>
         </div>
