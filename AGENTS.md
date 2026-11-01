@@ -49,6 +49,7 @@ npm run password -- 新密码    # 至少 6 位
 - 也支持环境变量 `SITE_DIR` / `HOST` / `PORT` 覆盖。
 - 找不到网站数据时，`resolveSiteDir()` 会依次尝试 `../MidoriWebSite`、`../MIDORI`、`E:\Midori-project\...`。所以改名或移动目录后，改 `config.json` 的 `siteDir` 最稳。
 - 管理员实际只会双击 `1-setup.bat` / `2-start-admin.bat` / `3-publish.bat`，改这三个脚本时保持「小白双击也能用」的门槛：中文提示 + `pause`。
+- `2-start-admin.bat` 是**纯 ASCII** 的引导脚本，中文提示都在 `start-admin.mjs`。cmd 解析长的 UTF-8 中文批处理会串行（见第三节说明），不要为了「统一风格」把提示语搬回 `.bat`。
 
 ---
 
@@ -114,6 +115,9 @@ src/
 ## 三、后台结构（`../MIDORIadmin`）
 
 ```
+1-setup.bat / 3-publish.bat   给管理员双击的脚本（UTF-8 中文，命令不多，目前没问题）
+2-start-admin.bat             **纯 ASCII** 引导脚本：只负责找到 node 并调起 start-admin.mjs
+start-admin.mjs               启动逻辑：找网站目录、按需 git pull、探端口、开浏览器、起 server.mjs
 server.mjs          单文件 Node 服务：登录、模型/横幅/返图/标签 API、图片落盘、跑构建
 public/
   index.html        唯一的 HTML，CSP 严格：不许内联 <script>、不许外链 CDN
@@ -121,9 +125,11 @@ public/
   imagetools.js ~295 行 canvas 裁剪 6:5 + 水印（右下角 / 斜向平铺 / 居中）
   style.css    ~910 行
 originals/<modelId>/  管理员上传的原图 + meta.json（裁剪记录），**不发布**
-backups/              models-*.json / tags-*.json / gallery-*.json，各保留最近 30 份
+backups/              models-*.json / tags-*.json / gallery-*.json / rail-*.json，各保留最近 30 份
 trash/                删除的图片和模型目录，误删可捞
 ```
+
+> **别往 `2-start-admin.bat` 里加中文。** cmd.exe 读取批处理时按字节跳行，UTF-8 中文 + `chcp` 会让它在 `goto` / 条件块之后从字符中间继续读，把半行中文当命令执行（`'xxx' is not recognized`）。文件一长（约 5 KB 以上）必现。所有中文提示放在 `start-admin.mjs` 里。
 
 ### API（全部 JSON，非 GET 会校验 `Origin`）
 
