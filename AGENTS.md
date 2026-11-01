@@ -122,7 +122,7 @@ server.mjs          单文件 Node 服务：登录、模型/横幅/返图/标签
 public/
   index.html        唯一的 HTML，CSP 严格：不许内联 <script>、不许外链 CDN
   app.js      ~1030 行  用 el() 手搓 DOM 的单页后台（无框架）
-  imagetools.js ~295 行 canvas 裁剪 6:5 + 水印（右下角 / 斜向平铺 / 居中）
+  imagetools.js ~295 行 canvas 裁剪 + 水印（右下角 / 斜向平铺 / 居中），比例可传参
   style.css    ~910 行
 originals/<modelId>/  管理员上传的原图 + meta.json（裁剪记录），**不发布**
 backups/              models-*.json / tags-*.json / gallery-*.json / rail-*.json，各保留最近 30 份
@@ -158,7 +158,7 @@ trash/                删除的图片和模型目录，误删可捞
 - 保存模型时若中途抛错，要回滚本次新写入的图片（`written` / `writtenOrig` 数组就是干这个的）。
 - 字段限制（服务端 `text(value, max)`）：`name` 80、`series` 80、`code` 16、`price` 60、`author` 60、`platform` 80、`download` 40、`vram` 40、`link` 600、`description` 30000；`versions` 最多 12 条；每级标签最多 40 个、单个 ≤24 字。
 - `erpImage`（ERP 预设图）走独立的上传路径：`undefined` = 沿用上一张，`""` = 删除，`data:image/...` = 新上传（服务端 `savePublicWebp` 存成 `<时间戳>-erp-<随机>.webp`）。它**不属于** `images`，要与 `images` / `fullImages` 一起进 `keepImages`，否则保存时会被当垃圾图移进 `trash/`。
-- ERP 预设图和详情图用**同一个裁剪器**（`imagetools.js` 的 `openEditor` / `renderDisplay`，比例 6:5）。裁剪记录存在 `originals/<id>/meta.json` 的保留键 `__erp__` 里（`{ original, crop, mark }`），保全原图才能在以后重新框选时不在已裁过的图上再裁。保存时额外传 `erpImageOriginal` / `erpImageCrop` / `erpImageMark`；`GET /api/models` 把它单独返回成 `erpMeta`。清理 `originals/` 时要把 `__erp__.original` 一起算进保留集合。
+- ERP 预设图和详情图用**同一个裁剪器**（`imagetools.js` 的 `openEditor` / `renderDisplay`），但比例不同：**详情图 `ASPECT = 6/5`，ERP 预设图 `ASPECT_SQUARE = 1`**（因为首页 `.sheet .frame` 是 1:1，详情页图位是 6:5）。`openEditor(item, aspect, { where })` / `renderDisplay(item, maxW, aspect)` 都接受比例参数，默认 6:5；ERP 那边必须显式传 `ASPECT_SQUARE`。裁剪记录存在 `originals/<id>/meta.json` 的保留键 `__erp__` 里（`{ original, crop, mark }`），保全原图才能在以后重新框选时不在已裁过的图上再裁。保存时额外传 `erpImageOriginal` / `erpImageCrop` / `erpImageMark`；`GET /api/models` 把它单独返回成 `erpMeta`。清理 `originals/` 时要把 `__erp__.original` 一起算进保留集合。
 - `id`（即 `public/models/<id>/` 目录名，创建后不能改）必须匹配 `^[a-z0-9][a-z0-9-]{0,48}$`。
 - 不填 `code` 时自动顺延成 `#NN`；`models.json` 按 `code` 里的数字排序。
 - CSP 是 `default-src 'self'`：字体、图标、脚本都不能外链，图片只允许 `self data: blob:`。
@@ -227,6 +227,6 @@ trash/                删除的图片和模型目录，误删可捞
 2. **后台找不到网站** → 多半是文件夹名不是 `MidoriWebSite` / `MIDORI`，或不在同级。改 `config.json` 的 `siteDir`。
 3. **保存图片报「网站上的图片必须是 webp」** → 直接绕过浏览器处理流程塞了 png/jpg；只能走后台的 canvas 流程。
 4. **标签报「同时写在了…」/「已经是…里的标签了」** → 同一个标签只能属于一级，且不能占用 `可ERP` / `无ERP`。
-5. **详情页图片比例** → 固定 6:5，裁剪框和 `imagetools.js` 的 `ASPECT` 绑定；改比例要同时改 CSS 与后台裁剪器。
+5. **图片比例** → 详情页图位固定 6:5（`ASPECT`），首页模型卡片封面是 1:1（`ASPECT_SQUARE`，ERP 预设图用它）。改比例要同时改 CSS 与后台裁剪器传的 `aspect`。
 6. **部署失败** → 看 Actions 的 `SSH_KEY / SSH_HOST / SSH_USER` secrets；rsync 目标写死 `/www/wwwroot/Midori.zone/`，带 `--delete`。
 7. **暗色模式** → 只有 `dataset.theme` 与少量变量，按钮点了弹「还没有实现」。别把它当成已完成功能。
