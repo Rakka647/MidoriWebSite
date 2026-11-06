@@ -30,11 +30,13 @@ jobs:
 
       - run: npm ci
 
-      # Pages 项目站点跑在 /MidoriWebSite/ 子路径下，必须带 base 构建，
-      # 否则 /assets/* 和图片都会 404。
+      # base 用相对路径 './'，这样同一份产物在两个地址下都能用：
+      #   https://midori.zone/                        （自定义域名，根路径）
+      #   https://rakka647.github.io/MidoriWebSite/   （项目站点，子路径）
+      # 站点是 hash 路由，文档路径不会变，相对路径不会解析错。
       - run: npm run build
         env:
-          SITE_BASE: /MidoriWebSite/
+          SITE_BASE: ./
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
