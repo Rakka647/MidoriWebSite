@@ -4,7 +4,7 @@ MIDORI 是一个 VRChat 成品模型展示站。项目由**两个独立仓库**�
 
 | 文件夹 | 作用 | 技术 | 部署 |
 | --- | --- | --- | --- |
-| `MIDORI`（本仓库，线上仓库名 `MidoriWebSite`） | 访客看的展示网站 | React 19 + TypeScript + Vite 8 | 推 `main` → GitHub Actions 构建 → 同时发布到 GitHub Pages（`midori.zone`）与 rsync 到香港服务器 |
+| `MIDORI`（本仓库，线上仓库名 `MidoriWebSite`） | 访客看的展示网站 | React 19 + TypeScript + Vite 8 | 推 `main` → GitHub Actions 构建 → rsync 到香港服务器（**线上主站**）；同时另有一条 Pages 发布流程，目前未启用自定义域名 |
 | `MIDORIadmin`（同级目录，独立仓库） | 管理员上传 / 修改内容 | 零依赖 Node HTTP 服务 + 原生 JS | **只在管理员本机**跑，不上公网 | 密码只在 `config.json` 里存哈希，**不要写进任何提交内容** |
 
 数据流只有一条：
@@ -12,9 +12,13 @@ MIDORI 是一个 VRChat 成品模型展示站。项目由**两个独立仓库**�
 ```
 后台写 JSON / 图片  →  MIDORI/src/content/*.json + MIDORI/public/{models,banner,gallery}/
         ↓ git push main
-├─ .github/workflows/deploy.yml → npm ci && npm run build → rsync dist/ 到香港服务器
-└─ .github/workflows/pages.yml  → npm ci && npm run build → 发布到 GitHub Pages（自定义域名 midori.zone，见 public/CNAME）
+├─ .github/workflows/deploy.yml → npm ci && npm run build → rsync dist/ 到香港服务器（线上主站，midori.zone 指这里）
+└─ .github/workflows/pages.yml  → npm ci && npm run build → 发布到 GitHub Pages（目前无自定义域名）
 ```
+
+> **GitHub Pages 的证书悖论**（2026-11 实测）：Pages 的自定义域名证书只有在 DNS 已经指向 Pages 之后才会签发；DNS 没指过去，`Enforce HTTPS` 永远开不了（API 报 `certificate does not exist yet`）。所以「等证书签好了再切 DNS」这条路不存在，切换必然有一段 HTTPS 不可用的窗口（实测 >4 分钟，最长可能几十分钟）。
+>
+> 另外 Let's Encrypt 对失败签发有速率限制，**不要在 DNS 未指向 Pages 时反复让 GitHub 尝试**。真要迁 Pages 的顺序是：低峰期一次性改 DNS → 等证书 → 开 Enforce HTTPS。
 
 > 仓库**必须保持 public**：GitHub Pages 在免费账号下不支持私有仓库。仓库里只有已经公开的展示内容，任何密钥 / 密码都不许提交。
 
