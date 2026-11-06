@@ -1,6 +1,7 @@
 ﻿import raw from "./content/models.json" with { type: "json" }
 import rawPool from "./content/tags.json" with { type: "json" }
 import rawBanner from "./content/banner.json" with { type: "json" }
+import { asset } from "./base"
 
 export type Model = {
   id: string
@@ -38,7 +39,12 @@ export function fullImage(model: Pick<Model, "images" | "fullImages">, index: nu
   return model.fullImages?.[index] || model.images[index] || ""
 }
 
-export const models = raw as Model[]
+export const models = (raw as Model[]).map((model) => ({
+  ...model,
+  images: (model.images ?? []).map(asset),
+  fullImages: model.fullImages?.map(asset),
+  erpImage: model.erpImage ? asset(model.erpImage) : model.erpImage,
+}))
 
 const bannerConfig = rawBanner as { slides?: { src?: string; modelId?: string }[] }
 
@@ -53,7 +59,7 @@ export function bannerSlides(list: Model[], count = 4): BannerSlide[] {
     const src = typeof item?.src === "string" ? item.src.trim() : ""
     const model = typeof item?.modelId === "string" ? byId.get(item.modelId) : undefined
     if (!src || !model) continue
-    slides.push({ id: model.id, src, tags: bannerTags(model) })
+    slides.push({ id: model.id, src: asset(src), tags: bannerTags(model) })
   }
   return slides
 }

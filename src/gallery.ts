@@ -1,4 +1,5 @@
 import raw from "./content/gallery.json" with { type: "json" }
+import { asset } from "./base"
 
 export type GalleryItem = {
   id: string
@@ -16,7 +17,9 @@ export type GalleryItem = {
   models: string[]
 }
 
-export const galleryItems = (raw as GalleryItem[]).filter((item) => item && item.image)
+export const galleryItems = (raw as GalleryItem[])
+  .filter((item) => item && item.image)
+  .map((item) => ({ ...item, image: asset(item.image), thumb: item.thumb ? asset(item.thumb) : item.thumb }))
 
 export function galleryLabel(item: Pick<GalleryItem, "no">) {
   return `#${String(item.no).padStart(3, "0")}`

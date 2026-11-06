@@ -1,4 +1,5 @@
 import raw from "./content/rail.json" with { type: "json" }
+import { asset } from "./base"
 
 export type RailLink = { label: string; url: string }
 export type RailQr = { src: string; caption: string }
@@ -60,7 +61,8 @@ function qrList(value: unknown): RailQr[] {
     .map((item) => ({ src: text(item?.src, 200), caption: text(item?.caption, 24) }))
     .filter((item) => item.src.startsWith("/qr/") && !item.src.includes(".."))
     .slice(0, 4)
-  return qrs.length ? qrs : [{ src: "/qr/qq.png", caption: "QQ 群" }]
+    .map((item) => ({ ...item, src: asset(item.src) }))
+  return qrs.length ? qrs : [{ src: asset("/qr/qq.png"), caption: "QQ 群" }]
 }
 
 const links = shopLinks(DATA.shop?.links)
