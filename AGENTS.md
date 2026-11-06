@@ -231,5 +231,6 @@ trash/                删除的图片和模型目录，误删可捞
 3. **保存图片报「网站上的图片必须是 webp」** → 直接绕过浏览器处理流程塞了 png/jpg；只能走后台的 canvas 流程。
 4. **标签报「同时写在了…」/「已经是…里的标签了」** → 同一个标签只能属于一级，且不能占用 `可ERP` / `无ERP`。
 5. **图片比例** → 详情页图位固定 6:5（`ASPECT`），首页模型卡片封面是 1:1（`ASPECT_SQUARE`，ERP 预设图用它）。改比例要同时改 CSS 与后台裁剪器传的 `aspect`。
-6. **部署失败** → 看 Actions 的 `SSH_KEY / SSH_HOST / SSH_USER` secrets；rsync 目标写死 `/www/wwwroot/Midori.zone/`，带 `--delete`。
+6. **部署失败** → 看 Actions 的 `SSH_KEY / SSH_HOST / SSH_USER` secrets；rsync 目标写死 `/www/wwwroot/Midori.zone/`，带 `--delete`。Pages 那条看 `Deploy to GitHub Pages`（需要 Settings → Pages 的 Source 为 GitHub Actions）。
+7. **Pages 域名 / HTTPS** → `midori.zone` 的 DNS 必须指向 Pages：`A @ 185.199.108.153 / .109.153 / .110.153 / .111.153`，`CNAME www rakka647.github.io`。DNS 没指向 Pages 之前，Pages 的证书签不出来，`Enforce HTTPS` 也打不开（API 报 `certificate does not exist yet`）。**不要给 `www` 保留旧服务器解析**，否则会拿到自签名证书。
 7. **暗色模式** → 只有 `dataset.theme` 与少量变量，按钮点了弹「还没有实现」。别把它当成已完成功能。
