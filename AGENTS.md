@@ -12,18 +12,32 @@ MIDORI 是一个 VRChat 成品模型展示站。项目由**两个独立仓库**�
 ```
 后台写 JSON / 图片  →  MIDORI/src/content/*.json + MIDORI/public/{models,banner,gallery}/
         ↓ git push main
-├─ .github/workflows/deploy.yml → npm ci && npm run build → rsync dist/ 到香港服务器（线上主站，midori.zone 指这里）
-├─ .github/workflows/pages.yml  → npm ci && npm run build → 发布到 GitHub Pages（目前无自定义域名）
+├─ .github/workflows/deploy.yml → npm ci && npm run build → rsync dist/ 到香港服务器（**备用**，156.239.8.244）
+├─ .github/workflows/pages.yml  → npm ci && npm run build → 发布到 GitHub Pages（**线上主站，midori.zone 指这里**）
 └─ Cloudflare Workers Builds   → 仓库里没有 wrangler 配置，全在 Dashboard 里配。同样推 main 自动构建
                                   https://midoriwebsite.rakkasatori647.workers.dev（base 是 `/`，不是子路径）
 ```
 
-三个地址并行存在，内容同源。Cloudflare 那条是唯一带边缘缓存的，静态资源缓存策略写在 `public/_headers`
-（构建后进 `dist/`）：`/assets/*` 一年 immutable，图片类 7 天。GitHub Pages 和 nginx 都忽略这个文件。
+三个地址并行存在，内容同源：
 
-> **GitHub Pages 的证书悖论**（2026-11 实测）：Pages 的自定义域名证书只有在 DNS 已经指向 Pages 之后才会签发；DNS 没指过去，`Enforce HTTPS` 永远开不了（API 报 `certificate does not exist yet`）。所以「等证书签好了再切 DNS」这条路不存在，切换必然有一段 HTTPS 不可用的窗口（实测 >4 分钟，最长可能几十分钟）。
+| 地址 | 角色 |
+| --- | --- |
+| `https://midori.zone/` + `https://www.midori.zone/` | **线上主站（GitHub Pages）**，DNS `A @` → 4 条 Pages IP，`CNAME www` → `rakka647.github.io` |
+| `https://rakka647.github.io/MidoriWebSite/` | Pages 的默认地址，同一个产物，仍可用 |
+| `https://midoriwebsite.rakkasatori647.workers.dev/` | 带边缘缓存的 Cloudflare 线路 |
+
+`pages.yml` 用 `SITE_BASE=./`（相对 base）构建，这样同一份产物在域名根路径和 `/MidoriWebSite/` 子路径下都能用。站点是 hash 路由，文档路径不变，相对路径不会解析错。**不要改回 `/MidoriWebSite/`**——自定义域名下 Pages 把产物放在域名根，绝对子路径前缀会让所有资源 404。
+
+Cloudflare 那条的静态资源缓存策略写在 `public/_headers`（构建后进 `dist/`）：`/assets/*` 一年 immutable，图片类 7 天。GitHub Pages 和 nginx 都忽略这个文件。
+
+> **GitHub Pages 自定义域名的两个坑**（2026-11 实测）：
 >
-> 另外 Let's Encrypt 对失败签发有速率限制，**不要在 DNS 未指向 Pages 时反复让 GitHub 尝试**。真要迁 Pages 的顺序是：低峰期一次性改 DNS → 等证书 → 开 Enforce HTTPS。
+> 1. **证书悖论**：Pages 的自定义域名证书只有在 DNS 已经指向 Pages 之后才会签发；DNS 没指过去，`Enforce HTTPS` 永远开不了（API 报 `certificate does not exist yet`）。所以「等证书签好了再切 DNS」这条路不存在，切换必然有一段 HTTPS 不可用窗口。
+> 2. **XML/HTTP 站点仍会亮绿的假象**：证书没下来时 `http://` 已经 200，看起来「站好了」，其实 `https://` 还是 `*.github.io` 的默认证书 → `ERR_CERT_COMMON_NAME_INVALID`。必须用 `openssl s_client` 或看 SAN 确认，别只看浏览器/HTTP 状态码。
+>
+> 实测时间线：DNS 切到 Pages **19 分钟后**证书状态才从空变 `authorization_pending`，再 30 秒变 `approved`。`https_certificate` 字段为空 ≠ 排队中，可能是请求压根没入队（先把 `cname` 清空再设回来就会丢任务）。等超过 30 分钟还是空，就去 Settings → Pages 看它自己的 DNS check 状态。
+>
+> Let's Encrypt 对失败签发有速率限制，**不要在 DNS 未指向 Pages 时反复让 GitHub 尝试**。
 
 > 仓库**必须保持 public**：GitHub Pages 在免费账号下不支持私有仓库。仓库里只有已经公开的展示内容，任何密钥 / 密码都不许提交。
 
@@ -244,8 +258,9 @@ trash/                删除的图片和模型目录，误删可捞
 5. **图片比例** → 详情页图位固定 6:5（`ASPECT`），首页模型卡片封面是 1:1（`ASPECT_SQUARE`，ERP 预设图用它）。改比例要同时改 CSS 与后台裁剪器传的 `aspect`。
 6. **部署失败** → 看 Actions 的 `SSH_KEY / SSH_HOST / SSH_USER` secrets；rsync 目标写死 `/www/wwwroot/Midori.zone/`，带 `--delete`。Pages 那条看 `Deploy to GitHub Pages`（需要 Settings → Pages 的 Source 为 GitHub Actions）。
 7. **Pages 域名 / HTTPS** → `midori.zone` 的 DNS 必须指向 Pages：`A @ 185.199.108.153 / .109.153 / .110.153 / .111.153`，`CNAME www rakka647.github.io`。DNS 没指向 Pages 之前，Pages 的证书签不出来，`Enforce HTTPS` 也打不开（API 报 `certificate does not exist yet`）。**不要给 `www` 保留旧服务器解析**，否则会拿到自签名证书。
-7. **暗色模式** → 只有 `dataset.theme` 与少量变量，按钮点了弹「还没有实现」。别把它当成已完成功能。
-8. **Pages 上图片全 404** → 用了子路径但没走 `asset()`；或者 `pages.yml` 忘了 `SITE_BASE=/MidoriWebSite/`。根路径构建（服务器）不受影响，所以本地 `npm run build` 看不出来。
-9. **Pages 站点地址** → `https://rakka647.github.io/MidoriWebSite/`（当前没有自定义域名）。`https://rakka647.github.io/` 本身 404，因为这个仓库不是 user site。
-10. **Cloudflare Workers 那条** → `https://midoriwebsite.rakkasatori647.workers.dev`，配置在 Dashboard 里，仓库里搜不到 wrangler 文件。要改构建命令 / 输出目录只能到 Cloudflare 控制台改。
-11. **改了缓存策略** → 动 `public/_headers`，别去改 nginx 或 Pages 设置。前者要 SSH 进服务器（没配密钥），后者不支持 `_headers`。
+8. **暗色模式** → 只有 `dataset.theme` 与少量变量，按钮点了弹「还没有实现」。别把它当成已完成功能。
+9. **Pages 资源 404** → 检查 `pages.yml` 的 `SITE_BASE` 是不是 `./`。用绝对子路径前缀（`/MidoriWebSite/`）在自定义域名下会全站 404，因为 Pages 把产物放在域名根。新增图片相关渲染时一律走 `src/base.ts` 的 `asset()`。
+10. **Pages 站点地址** → 主入口 `https://midori.zone/`（自定义域名），默认地址 `https://rakka647.github.io/MidoriWebSite/` 也还能用。`https://rakka647.github.io/` 本身 404，因为这个仓库不是 user site。
+11. **Cloudflare Workers 那条** → `https://midoriwebsite.rakkasatori647.workers.dev`，配置在 Dashboard 里，仓库里搜不到 wrangler 文件。要改构建命令 / 输出目录只能到 Cloudflare 控制台改。
+12. **改了缓存策略** → 动 `public/_headers`，别去改 nginx 或 Pages 设置。前者要 SSH 进服务器（没配密钥），后者不支持 `_headers`。
+13. **香港服务器还要不要** → 要。它的 nginx 和证书是独立的一套，`deploy.yml` 每次推送仍然同步。想临时把域名切回去，把 `A @` 和 `A www` 改回 `156.239.8.244` 即可（证书对 `midori.zone` 有效，`www` 没有，所以 www 仍要先修 certbot）。
