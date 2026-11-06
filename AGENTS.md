@@ -4,7 +4,7 @@ MIDORI 是一个 VRChat 成品模型展示站。项目由**两个独立仓库**�
 
 | 文件夹 | 作用 | 技术 | 部署 |
 | --- | --- | --- | --- |
-| `MIDORI`（本仓库，线上仓库名 `MidoriWebSite`） | 访客看的展示网站 | React 19 + TypeScript + Vite 8 | 推 `main` → GitHub Actions 构建 → rsync 到香港服务器（**线上主站**）；同时另有一条 Pages 发布流程，目前未启用自定义域名 |
+| `MIDORI`（本仓库，线上仓库名 `MidoriWebSite`） | 访客看的展示网站 | React 19 + TypeScript + Vite 8 | 推 `main` → 三条并行产物：GitHub Pages、Cloudflare Workers（**`midori.zone` 线上主站**）、香港服务器 rsync（备用） |
 | `MIDORIadmin`（同级目录，独立仓库） | 管理员上传 / 修改内容 | 零依赖 Node HTTP 服务 + 原生 JS | **只在管理员本机**跑，不上公网 | 密码只在 `config.json` 里存哈希，**不要写进任何提交内容** |
 
 数据流只有一条：
@@ -13,18 +13,26 @@ MIDORI 是一个 VRChat 成品模型展示站。项目由**两个独立仓库**�
 后台写 JSON / 图片  →  MIDORI/src/content/*.json + MIDORI/public/{models,banner,gallery}/
         ↓ git push main
 ├─ .github/workflows/deploy.yml → npm ci && npm run build → rsync dist/ 到香港服务器（**备用**，156.239.8.244）
-├─ .github/workflows/pages.yml  → npm ci && npm run build → 发布到 GitHub Pages（**线上主站，midori.zone 指这里**）
+├─ .github/workflows/pages.yml  → npm ci && npm run build → 发布到 GitHub Pages（备用地址）
 └─ Cloudflare Workers Builds   → 仓库里没有 wrangler 配置，全在 Dashboard 里配。同样推 main 自动构建
-                                  https://midoriwebsite.rakkasatori647.workers.dev（base 是 `/`，不是子路径）
+                                  （**线上主站**：midori.zone = 该 Worker 的 Custom Domain，base 是 `/`）
 ```
 
 三个地址并行存在，内容同源：
 
 | 地址 | 角色 |
 | --- | --- |
-| `https://midori.zone/` + `https://www.midori.zone/` | **线上主站（GitHub Pages）**，DNS `A @` → 4 条 Pages IP，`CNAME www` → `rakka647.github.io` |
+| `https://midori.zone/` | **线上主站**。NS 在 Cloudflare，源站是 Worker Custom Domain（`AAAA 100::` 代理），`www` 由 Redirect Rule 301 到根域 |
 | `https://rakka647.github.io/MidoriWebSite/` | Pages 的默认地址，同一个产物，仍可用 |
-| `https://midoriwebsite.rakkasatori647.workers.dev/` | 带边缘缓存的 Cloudflare 线路 |
+| `https://midoriwebsite.rakkasatori647.workers.dev/` | Worker 的默认地址，`midori.zone` 就指这里 |
+
+**`midori.zone` 的权威 DNS 已经不是阿里云了**：注册局委派到 `alec.ns.cloudflare.com` / `savanna.ns.cloudflare.com`，zone `583305bddf1e6ba08c2dbe5ab913822e`，2026-11-06 12:06 UTC 激活。
+阿里云那边只保留域名注册关系和一份「回滚用」的解析记录（`A @` → 4 条 Pages IP、`CNAME www` → `rakka647.github.io`），改回阿里云 NS 就能回到直连 Pages 的状态。
+
+> **Cloudflare zone 激活流程**（2026-11 实测，容易卡住）：
+> 新建 zone 后状态是 `initializing`，此时 CF 的 NS **拒绝应答**（`Query refused`），而注册局那边委派已经切过去了 → 用新委派的递归解析器会拿到 `SERVFAIL`（腾讯 DNS / Quad9 / 1.1.1.1 立刻中招，阿里和 Google 靠 6h 缓存暂时正常）。
+> 必须走完控制台的 onboarding：`select-plan`（选 Free）→ `manual-entry`（确认 DNS 记录）→ **`Continue to activation`**，zone 才会从 `initializing` 变 `pending`，`initializing` 状态下调 `PUT /zones/{id}/activation_check` 会报 `81163 The zone status prevents the operation`。
+> 变 `pending` 后再调一次 `activation_check`，几十秒内变 `active`，HTTPS 证书约 2 分钟后可用。
 
 `pages.yml` 用 `SITE_BASE=./`（相对 base）构建，这样同一份产物在域名根路径和 `/MidoriWebSite/` 子路径下都能用。站点是 hash 路由，文档路径不变，相对路径不会解析错。**不要改回 `/MidoriWebSite/`**——自定义域名下 Pages 把产物放在域名根，绝对子路径前缀会让所有资源 404。
 
@@ -257,10 +265,11 @@ trash/                删除的图片和模型目录，误删可捞
 4. **标签报「同时写在了…」/「已经是…里的标签了」** → 同一个标签只能属于一级，且不能占用 `可ERP` / `无ERP`。
 5. **图片比例** → 详情页图位固定 6:5（`ASPECT`），首页模型卡片封面是 1:1（`ASPECT_SQUARE`，ERP 预设图用它）。改比例要同时改 CSS 与后台裁剪器传的 `aspect`。
 6. **部署失败** → 看 Actions 的 `SSH_KEY / SSH_HOST / SSH_USER` secrets；rsync 目标写死 `/www/wwwroot/Midori.zone/`，带 `--delete`。Pages 那条看 `Deploy to GitHub Pages`（需要 Settings → Pages 的 Source 为 GitHub Actions）。
-7. **Pages 域名 / HTTPS** → `midori.zone` 的 DNS 必须指向 Pages：`A @ 185.199.108.153 / .109.153 / .110.153 / .111.153`，`CNAME www rakka647.github.io`。DNS 没指向 Pages 之前，Pages 的证书签不出来，`Enforce HTTPS` 也打不开（API 报 `certificate does not exist yet`）。**不要给 `www` 保留旧服务器解析**，否则会拿到自签名证书。
+7. **Pages 域名 / HTTPS** → `midori.zone` 现在走 Cloudflare（NS 已委派），不再直连 Pages。只有回滚时才需要把 `A @ 185.199.108.153 / .109.153 / .110.153 / .111.153`、`CNAME www rakka647.github.io` 指回 Pages。DNS 没指向 Pages 之前，Pages 的证书签不出来，`Enforce HTTPS` 也打不开（API 报 `certificate does not exist yet`）。**不要给 `www` 保留旧服务器解析**，否则会拿到自签名证书。
 8. **暗色模式** → 只有 `dataset.theme` 与少量变量，按钮点了弹「还没有实现」。别把它当成已完成功能。
 9. **Pages 资源 404** → 检查 `pages.yml` 的 `SITE_BASE` 是不是 `./`。用绝对子路径前缀（`/MidoriWebSite/`）在自定义域名下会全站 404，因为 Pages 把产物放在域名根。新增图片相关渲染时一律走 `src/base.ts` 的 `asset()`。
-10. **Pages 站点地址** → 主入口 `https://midori.zone/`（自定义域名），默认地址 `https://rakka647.github.io/MidoriWebSite/` 也还能用。`https://rakka647.github.io/` 本身 404，因为这个仓库不是 user site。
-11. **Cloudflare Workers 那条** → `https://midoriwebsite.rakkasatori647.workers.dev`，配置在 Dashboard 里，仓库里搜不到 wrangler 文件。要改构建命令 / 输出目录只能到 Cloudflare 控制台改。
-12. **改了缓存策略** → 动 `public/_headers`，别去改 nginx 或 Pages 设置。前者要 SSH 进服务器（没配密钥），后者不支持 `_headers`。
-13. **香港服务器还要不要** → 要。它的 nginx 和证书是独立的一套，`deploy.yml` 每次推送仍然同步。想临时把域名切回去，把 `A @` 和 `A www` 改回 `156.239.8.244` 即可（证书对 `midori.zone` 有效，`www` 没有，所以 www 仍要先修 certbot）。
+10. **站点地址** → 主入口 `https://midori.zone/`（Cloudflare → Worker），默认地址 `https://rakka647.github.io/MidoriWebSite/` 和 `https://midoriwebsite.rakkasatori647.workers.dev/` 也还能用。`https://rakka647.github.io/` 本身 404，因为这个仓库不是 user site。
+11. **Cloudflare Workers 那条** → `https://midoriwebsite.rakkasatori647.workers.dev`，配置在 Dashboard 里，仓库里搜不到 wrangler 文件。要改构建命令 / 输出目录只能到 Cloudflare 控制台改。`midori.zone` / `www.midori.zone` 是它的 Custom Domain，DNS 里那两条代理 `AAAA 100::` 是 CF 自动生成的，**不要手动改**（直接建 A 记录会报 `81062 A DNS record managed by Workers already exists`）。
+12. **www 与根域** → `www.midori.zone` 由 CF 的 Redirect Rule（dynamic redirect, phase `http_request_dynamic_redirect`）301 到 `https://midori.zone` + 原路径。改规则去 Rules → Redirect Rules，别去 Worker 里写。
+13. **改了缓存策略** → 动 `public/_headers`，别去改 nginx 或 Pages 设置。前者要 SSH 进服务器（没配密钥），后者不支持 `_headers`。
+14. **香港服务器还要不要** → 要。它的 nginx 和证书是独立的一套，`deploy.yml` 每次推送仍然同步。想临时把域名切回去，把 `A @` 和 `A www` 改回 `156.239.8.244` 即可（证书对 `midori.zone` 有效，`www` 没有，所以 www 仍要先修 certbot）。
