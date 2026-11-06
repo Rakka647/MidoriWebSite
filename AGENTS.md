@@ -42,6 +42,8 @@ npm run preview
 - `npm start` 是**故意报错**的，用来挡住「在网站目录里起后台」这个误操作。后台去 `MIDORIadmin` 里起。
 - Node 版本见 `.node-version`（22）。
 - `dist/` 已 gitignore，永远不要手改或提交。
+- **部署子路径**：`vite.config.ts` 的 `base` 读环境变量 `SITE_BASE`，不设时是 `/`（香港服务器用这个）。GitHub Pages 项目站点跑在 `/MidoriWebSite/`，所以 `pages.yml` 里带 `SITE_BASE=/MidoriWebSite/` 构建。
+  内容 JSON 里的图片路径是根路径（`/models/...`），必须经 `src/base.ts` 的 `asset()` 补前缀后才会跟着 base 走——**新加图片相关的渲染时，一律用 `asset()`**，否则子路径部署会 404。
 
 ### 后台（`../MIDORIadmin`）
 
@@ -238,3 +240,5 @@ trash/                删除的图片和模型目录，误删可捞
 6. **部署失败** → 看 Actions 的 `SSH_KEY / SSH_HOST / SSH_USER` secrets；rsync 目标写死 `/www/wwwroot/Midori.zone/`，带 `--delete`。Pages 那条看 `Deploy to GitHub Pages`（需要 Settings → Pages 的 Source 为 GitHub Actions）。
 7. **Pages 域名 / HTTPS** → `midori.zone` 的 DNS 必须指向 Pages：`A @ 185.199.108.153 / .109.153 / .110.153 / .111.153`，`CNAME www rakka647.github.io`。DNS 没指向 Pages 之前，Pages 的证书签不出来，`Enforce HTTPS` 也打不开（API 报 `certificate does not exist yet`）。**不要给 `www` 保留旧服务器解析**，否则会拿到自签名证书。
 7. **暗色模式** → 只有 `dataset.theme` 与少量变量，按钮点了弹「还没有实现」。别把它当成已完成功能。
+8. **Pages 上图片全 404** → 用了子路径但没走 `asset()`；或者 `pages.yml` 忘了 `SITE_BASE=/MidoriWebSite/`。根路径构建（服务器）不受影响，所以本地 `npm run build` 看不出来。
+9. **Pages 站点地址** → `https://rakka647.github.io/MidoriWebSite/`（当前没有自定义域名）。`https://rakka647.github.io/` 本身 404，因为这个仓库不是 user site。
