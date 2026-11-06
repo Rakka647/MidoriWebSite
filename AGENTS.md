@@ -13,8 +13,13 @@ MIDORI 是一个 VRChat 成品模型展示站。项目由**两个独立仓库**�
 后台写 JSON / 图片  →  MIDORI/src/content/*.json + MIDORI/public/{models,banner,gallery}/
         ↓ git push main
 ├─ .github/workflows/deploy.yml → npm ci && npm run build → rsync dist/ 到香港服务器（线上主站，midori.zone 指这里）
-└─ .github/workflows/pages.yml  → npm ci && npm run build → 发布到 GitHub Pages（目前无自定义域名）
+├─ .github/workflows/pages.yml  → npm ci && npm run build → 发布到 GitHub Pages（目前无自定义域名）
+└─ Cloudflare Workers Builds   → 仓库里没有 wrangler 配置，全在 Dashboard 里配。同样推 main 自动构建
+                                  https://midoriwebsite.rakkasatori647.workers.dev（base 是 `/`，不是子路径）
 ```
+
+三个地址并行存在，内容同源。Cloudflare 那条是唯一带边缘缓存的，静态资源缓存策略写在 `public/_headers`
+（构建后进 `dist/`）：`/assets/*` 一年 immutable，图片类 7 天。GitHub Pages 和 nginx 都忽略这个文件。
 
 > **GitHub Pages 的证书悖论**（2026-11 实测）：Pages 的自定义域名证书只有在 DNS 已经指向 Pages 之后才会签发；DNS 没指过去，`Enforce HTTPS` 永远开不了（API 报 `certificate does not exist yet`）。所以「等证书签好了再切 DNS」这条路不存在，切换必然有一段 HTTPS 不可用的窗口（实测 >4 分钟，最长可能几十分钟）。
 >
@@ -242,3 +247,5 @@ trash/                删除的图片和模型目录，误删可捞
 7. **暗色模式** → 只有 `dataset.theme` 与少量变量，按钮点了弹「还没有实现」。别把它当成已完成功能。
 8. **Pages 上图片全 404** → 用了子路径但没走 `asset()`；或者 `pages.yml` 忘了 `SITE_BASE=/MidoriWebSite/`。根路径构建（服务器）不受影响，所以本地 `npm run build` 看不出来。
 9. **Pages 站点地址** → `https://rakka647.github.io/MidoriWebSite/`（当前没有自定义域名）。`https://rakka647.github.io/` 本身 404，因为这个仓库不是 user site。
+10. **Cloudflare Workers 那条** → `https://midoriwebsite.rakkasatori647.workers.dev`，配置在 Dashboard 里，仓库里搜不到 wrangler 文件。要改构建命令 / 输出目录只能到 Cloudflare 控制台改。
+11. **改了缓存策略** → 动 `public/_headers`，别去改 nginx 或 Pages 设置。前者要 SSH 进服务器（没配密钥），后者不支持 `_headers`。
