@@ -4,16 +4,19 @@ MIDORI 是一个 VRChat 成品模型展示站。项目由**两个独立仓库**�
 
 | 文件夹 | 作用 | 技术 | 部署 |
 | --- | --- | --- | --- |
-| `MIDORI`（本仓库，线上仓库名 `MidoriWebSite`） | 访客看的展示网站 | React 19 + TypeScript + Vite 8 | 推 `main` → GitHub Actions 构建 → rsync 到服务器 |
-| `MIDORIadmin`（同级目录，独立仓库） | 管理员上传 / 修改内容 | 零依赖 Node HTTP 服务 + 原生 JS | **只在管理员本机**跑，不上公网 | 密码是REDACTED |
+| `MIDORI`（本仓库，线上仓库名 `MidoriWebSite`） | 访客看的展示网站 | React 19 + TypeScript + Vite 8 | 推 `main` → GitHub Actions 构建 → 同时发布到 GitHub Pages（`midori.zone`）与 rsync 到香港服务器 |
+| `MIDORIadmin`（同级目录，独立仓库） | 管理员上传 / 修改内容 | 零依赖 Node HTTP 服务 + 原生 JS | **只在管理员本机**跑，不上公网 | 密码只在 `config.json` 里存哈希，**不要写进任何提交内容** |
 
 数据流只有一条：
 
 ```
 后台写 JSON / 图片  →  MIDORI/src/content/*.json + MIDORI/public/{models,banner,gallery}/
         ↓ git push main
-GitHub Actions（.github/workflows/deploy.yml）→ npm ci && npm run build → rsync dist/ 到服务器
+├─ .github/workflows/deploy.yml → npm ci && npm run build → rsync dist/ 到香港服务器
+└─ .github/workflows/pages.yml  → npm ci && npm run build → 发布到 GitHub Pages（自定义域名 midori.zone，见 public/CNAME）
 ```
+
+> 仓库**必须保持 public**：GitHub Pages 在免费账号下不支持私有仓库。仓库里只有已经公开的展示内容，任何密钥 / 密码都不许提交。
 
 > 网站**没有后端、没有数据库、没有 API**。所有内容在构建时被打进 bundle。
 > 后台**不参与部署**，它只是一个直接改网站仓库文件的本地工具。
