@@ -177,7 +177,7 @@
     "code": "#04",
     "name": "Meow",
     "series": "Sio",
-    "price": "¥69.9",
+    "price": "¥69.9 ~ ¥89.9",
     "erp": true,
     "bodies": [
       "Sio"
@@ -212,6 +212,10 @@
       {
         "name": "无面捕版",
         "price": "¥69.9"
+      },
+      {
+        "name": "面捕版",
+        "price": "¥89.9"
       }
     ],
     "fullImages": [
